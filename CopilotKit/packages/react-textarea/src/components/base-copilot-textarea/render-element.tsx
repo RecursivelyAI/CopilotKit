@@ -1,4 +1,5 @@
 import { RenderElementProps } from "slate-react";
+import { JSX } from "react";
 
 export type RenderElementFunction = (props: RenderElementProps) => JSX.Element;
 

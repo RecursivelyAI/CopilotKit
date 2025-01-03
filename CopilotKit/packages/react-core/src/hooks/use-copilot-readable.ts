@@ -105,7 +105,7 @@ export function useCopilotReadable(
   dependencies?: any[],
 ): string | undefined {
   const { addContext, removeContext } = useCopilotContext();
-  const idRef = useRef<string>();
+  const idRef = useRef<string>(undefined);
   convert = convert || convertToJSON;
 
   const information = convert(description, value);

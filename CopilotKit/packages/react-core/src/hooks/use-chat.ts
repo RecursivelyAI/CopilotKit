@@ -141,12 +141,12 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
     setAgentSession,
   } = options;
 
-  const abortControllerRef = useRef<AbortController>();
+  const abortControllerRef = useRef<AbortController>(new AbortController());
   const threadIdRef = useRef<string | null>(null);
   const runIdRef = useRef<string | null>(null);
   const { addGraphQLErrorsToast } = useToast();
 
-  const runChatCompletionRef = useRef<(previousMessages: Message[]) => Promise<Message[]>>();
+  const runChatCompletionRef = useRef<(previousMessages: Message[]) => Promise<Message[]>>(undefined);
   // We need to keep a ref of coagent states and session because of renderAndWait - making sure
   // the latest state is sent to the API
   // This is a workaround and needs to be addressed in the future

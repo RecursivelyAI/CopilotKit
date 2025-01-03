@@ -280,7 +280,7 @@ export const useCopilotChatLogic = (
 
   const [currentSuggestions, setCurrentSuggestions] = useState<CopilotChatSuggestion[]>([]);
   const suggestionsAbortControllerRef = useRef<AbortController | null>(null);
-  const debounceTimerRef = useRef<any>();
+  const debounceTimerRef = useRef<any>(undefined);
 
   const abortSuggestions = () => {
     suggestionsAbortControllerRef.current?.abort();

@@ -1,6 +1,6 @@
 import { CopilotCloudConfig, FunctionCallHandler } from "@copilotkit/shared";
 import { ActionRenderProps, FrontendAction } from "../types/frontend-action";
-import React from "react";
+import React, { JSX } from "react";
 import { TreeNodeId } from "../hooks/use-tree";
 import { DocumentPointer } from "../types";
 import { CopilotChatSuggestionConfiguration } from "../types/chat-suggestion-configuration";

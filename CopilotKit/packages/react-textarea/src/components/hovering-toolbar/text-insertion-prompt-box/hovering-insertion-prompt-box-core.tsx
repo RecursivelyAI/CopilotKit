@@ -7,7 +7,7 @@ import { SourceSearchBox } from "../../source-search-box/source-search-box";
 import { DocumentPointer, useCopilotContext } from "@copilotkit/react-core";
 import { Button } from "../../ui/button";
 import { Label } from "../../ui/label";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 
 import { streamPromiseFlatten } from "../../../lib/stream-promise-flatten";
 import { IncludedFilesPreview } from "./included-files-preview";
@@ -51,8 +51,8 @@ export const HoveringInsertionPromptBoxCore = ({
     setSuggestedFiles(getDocumentsContext(contextCategories));
   }, [contextCategories, getDocumentsContext]);
 
-  useAutosizeTextArea(suggestionTextAreaRef, editSuggestion || "");
-  useAutosizeTextArea(adjustmentTextAreaRef, adjustmentPrompt || "");
+  useAutosizeTextArea(suggestionTextAreaRef as RefObject<HTMLTextAreaElement>, editSuggestion || "");
+  useAutosizeTextArea(adjustmentTextAreaRef as RefObject<HTMLTextAreaElement>, adjustmentPrompt || "");
 
   // initially focus on the adjustment prompt text area
   useEffect(() => {

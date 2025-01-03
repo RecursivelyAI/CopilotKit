@@ -16,9 +16,7 @@ interface FlatCategoryStoreElement<T> {
 }
 
 const useFlatCategoryStore = <T>(): UseFlatCategoryStoreReturn<T> => {
-  const [elements, dispatch] = useReducer<
-    React.Reducer<Map<FlatCategoryStoreId, FlatCategoryStoreElement<T>>, Action<T>>
-  >(flatCategoryStoreReducer, new Map<FlatCategoryStoreId, FlatCategoryStoreElement<T>>());
+  const [elements, dispatch] = useReducer(flatCategoryStoreReducer, new Map<FlatCategoryStoreId, FlatCategoryStoreElement<T>>());
 
   const addElement = useCallback((value: T, categories: string[]): FlatCategoryStoreId => {
     const newId = randomId();

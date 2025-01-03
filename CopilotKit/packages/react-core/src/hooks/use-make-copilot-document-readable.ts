@@ -15,7 +15,7 @@ export function useMakeCopilotDocumentReadable(
   dependencies: any[] = [],
 ): string | undefined {
   const { addDocumentContext, removeDocumentContext } = useCopilotContext();
-  const idRef = useRef<string>();
+  const idRef = useRef<string>(undefined);
 
   useEffect(() => {
     const id = addDocumentContext(document, categories);
