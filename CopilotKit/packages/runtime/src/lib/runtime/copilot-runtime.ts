@@ -12,7 +12,16 @@
  * ```
  */
 
-import { Action, actionParametersToJsonSchema, Parameter, randomId } from "@copilotkit/shared";
+import {
+  Action,
+  actionParametersToJsonSchema,
+  Parameter,
+  ResolvedCopilotKitError,
+  CopilotKitApiDiscoveryError,
+  randomId,
+  CopilotKitError,
+  CopilotKitLowLevelError,
+} from "@copilotkit/shared";
 import { CopilotServiceAdapter, RemoteChain, RemoteChainParameters } from "../../service-adapters";
 import { MessageInput } from "../../graphql/inputs/message.input";
 import { ActionInput } from "../../graphql/inputs/action.input";
@@ -284,18 +293,32 @@ export class CopilotRuntime<const T extends Parameter[] | [] = []> {
           }>;
         }
 
-        const response = await fetch(`${(endpoint as CopilotKitEndpoint).url}/info`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ properties: graphqlContext.properties }),
-        });
-        const data: InfoResponse = await response.json();
-        const endpointAgents = (data?.agents ?? []).map((agent) => ({
-          name: agent.name,
-          description: agent.description,
-          id: randomId(), // Required by Agent type
-        }));
-        return [...agents, ...endpointAgents];
+        try {
+          const response = await fetch(`${(endpoint as CopilotKitEndpoint).url}/info`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ properties: graphqlContext.properties }),
+          });
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new CopilotKitApiDiscoveryError();
+            }
+            throw new ResolvedCopilotKitError({ status: response.status });
+          }
+
+          const data: InfoResponse = await response.json();
+          const endpointAgents = (data?.agents ?? []).map((agent) => ({
+            name: agent.name,
+            description: agent.description,
+            id: randomId(), // Required by Agent type
+          }));
+          return [...agents, ...endpointAgents];
+        } catch (error) {
+          if (error instanceof CopilotKitError) {
+            throw error;
+          }
+          throw new CopilotKitLowLevelError(error as Error);
+        }
       },
       Promise.resolve([]),
     );
