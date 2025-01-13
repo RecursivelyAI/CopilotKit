@@ -8,6 +8,10 @@ import { Messages as DefaultMessages } from "./Messages";
 import { Input as DefaultInput } from "./Input";
 import { ResponseButton as DefaultResponseButton } from "./Response";
 import { CopilotChat, CopilotChatProps } from "./Chat";
+import { RenderTextMessage as DefaultTextMessage } from "./messages/RenderTextMessage";
+import { RenderResultMessage as DefaultResultMessage } from "./messages/RenderResultMessage";
+import { RenderActionExecutionMessage as DefaultActionExecutionMessage } from "./messages/RenderActionExecutionMessage";
+import { RenderAgentStateMessage as DefaultAgentStateMessage } from "./messages/RenderAgentStateMessage";
 
 export interface CopilotModalProps extends CopilotChatProps {
   /**
@@ -77,6 +81,10 @@ export const CopilotModal = ({
   Messages = DefaultMessages,
   Input = DefaultInput,
   ResponseButton = DefaultResponseButton,
+  RenderTextMessage = DefaultTextMessage,
+  RenderResultMessage = DefaultResultMessage,
+  RenderActionExecutionMessage = DefaultActionExecutionMessage,
+  RenderAgentStateMessage = DefaultAgentStateMessage,
   className,
   children,
 }: CopilotModalProps) => {
@@ -109,6 +117,10 @@ export const CopilotModal = ({
             Messages={Messages}
             Input={Input}
             ResponseButton={ResponseButton}
+            RenderTextMessage={RenderTextMessage}
+            RenderResultMessage={RenderResultMessage}
+            RenderActionExecutionMessage={RenderActionExecutionMessage}
+            RenderAgentStateMessage={RenderAgentStateMessage}
           />
         </Window>
       </div>
