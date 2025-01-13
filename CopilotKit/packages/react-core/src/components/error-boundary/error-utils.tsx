@@ -2,8 +2,7 @@ import React, { useCallback } from "react";
 import { GraphQLError } from "@copilotkit/runtime-client-gql";
 import { useToast } from "../toast/toast-provider";
 import { ExclamationMarkIcon } from "../toast/exclamation-mark-icon";
-import { ERROR_NAMES } from "@copilotkit/shared";
-import { CopilotKitError } from "@copilotkit/shared/src";
+import ReactMarkdown from "react-markdown";
 
 interface OriginalError {
   message?: string;
@@ -16,12 +15,6 @@ export function ErrorToast({ errors }: { errors: (Error | GraphQLError)[] }) {
       "extensions" in error ? (error.extensions?.originalError as undefined | OriginalError) : {};
     const message = originalError?.message ?? error.message;
     const code = "extensions" in error ? (error.extensions?.code as string) : null;
-
-    const cpkError =
-      // @ts-expect-error -- name is not one of possible keys
-      "extensions" in error && Object.values(ERROR_NAMES).includes(error.extensions.name)
-        ? error.extensions
-        : null;
 
     return (
       <div
@@ -44,16 +37,7 @@ export function ErrorToast({ errors }: { errors: (Error | GraphQLError)[] }) {
             <span style={{ fontFamily: "monospace", fontWeight: "normal" }}>{code}</span>
           </div>
         )}
-        {cpkError ? (
-          <>
-            <div style={{ marginBottom: 4 }} dangerouslySetInnerHTML={{ __html: message || "" }} />
-            <a href={cpkError.troubleshootingUrl as string} style={{ textDecoration: "underline" }}>
-              Learn More
-            </a>
-          </>
-        ) : (
-          <div>{message}</div>
-        )}
+        <ReactMarkdown>{message}</ReactMarkdown>
       </div>
     );
   });

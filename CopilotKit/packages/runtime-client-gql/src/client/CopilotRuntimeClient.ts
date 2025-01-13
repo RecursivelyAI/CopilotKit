@@ -21,7 +21,7 @@ const createFetchFn =
       }
       return result;
     } catch (error) {
-      throw new CopilotKitLowLevelError(error as Error);
+      throw new CopilotKitLowLevelError({ error: error as Error, url: args[0] as string });
     }
   };
 

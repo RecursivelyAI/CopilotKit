@@ -38,6 +38,7 @@
   "devDependencies": {
     "@types/jest": "^29.5.4",
     "@types/react": "^18.2.5",
+    "@types/react-dom": "^18.2.4",
     "eslint": "^8.56.0",
     "eslint-config-custom": "workspace:*",
     "jest": "^29.6.4",
@@ -45,13 +46,13 @@
     "ts-jest": "^29.1.1",
     "tsconfig": "workspace:*",
     "tsup": "^6.7.0",
-    "typescript": "^5.2.3",
-    "@types/react-dom": "^18.2.4"
+    "typescript": "^5.2.3"
   },
   "dependencies": {
     "@copilotkit/runtime-client-gql": "workspace:*",
     "@copilotkit/shared": "workspace:*",
     "@scarf/scarf": "^1.3.0",
+    "react-markdown": "^8.0.7",
     "untruncate-json": "^0.0.1"
   },
   "keywords": [

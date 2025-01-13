@@ -17,69 +17,55 @@ export enum CopilotKitErrorCode {
 }
 
 const BASE_URL = "https://docs.copilotkit.ai/coagents/troubleshooting/common-issues";
+
+const getSeeMoreMarkdown = (link: string) => `See more: [${link}](${link})`;
+
+export const ERROR_CONFIG = {
+  [CopilotKitErrorCode.NETWORK_ERROR]: {
+    statusCode: 503,
+    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
+  },
+  [CopilotKitErrorCode.INVALID_REQUEST]: {
+    statusCode: 400,
+    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
+  },
+  [CopilotKitErrorCode.SERVER_ERROR]: {
+    statusCode: 500,
+    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
+  },
+  [CopilotKitErrorCode.NOT_FOUND]: {
+    statusCode: 500,
+    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
+  },
+  [CopilotKitErrorCode.UNKNOWN]: {
+    statusCode: 500,
+    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
+  },
+};
+
 export class CopilotKitError extends GraphQLError {
   code: CopilotKitErrorCode;
   statusCode: number;
-  troubleshootingUrl?: string;
-
-  private static getErrorDetails(code: CopilotKitErrorCode): {
-    statusCode: number;
-    troubleshootingUrl: string;
-  } {
-    switch (code) {
-      case CopilotKitErrorCode.NETWORK_ERROR:
-        return {
-          statusCode: 503,
-          troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
-        };
-      case CopilotKitErrorCode.INVALID_REQUEST:
-        return {
-          statusCode: 400,
-          troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
-        };
-      case CopilotKitErrorCode.SERVER_ERROR:
-        return {
-          statusCode: 500,
-          troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
-        };
-      case CopilotKitErrorCode.NOT_FOUND:
-        return {
-          statusCode: 500,
-          troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
-        };
-      case CopilotKitErrorCode.UNKNOWN:
-        return {
-          statusCode: 500,
-          troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
-        };
-    }
-  }
 
   constructor({
     message = "Unknown error occurred",
     code,
-    troubleshootingUri,
   }: {
     message?: string;
     code: CopilotKitErrorCode;
-    troubleshootingUri?: string;
   }) {
     const name = ERROR_NAMES.COPILOT_ERROR;
-    const { statusCode, troubleshootingUrl } = CopilotKitError.getErrorDetails(code);
+    const { statusCode } = ERROR_CONFIG[code];
 
     super(message, {
       extensions: {
         name,
         statusCode,
-        troubleshootingUrl,
       },
     });
     this.code = code;
     this.name = name;
     this.statusCode = statusCode;
-    this.troubleshootingUrl = troubleshootingUri
-      ? `${BASE_URL}#${troubleshootingUri}`
-      : troubleshootingUrl;
   }
 }
 
@@ -94,7 +80,9 @@ export class CopilotKitError extends GraphQLError {
  */
 export class CopilotKitApiDiscoveryError extends CopilotKitError {
   constructor({ message = "Failed to find CopilotKit API endpoint" }: { message?: string } = {}) {
-    super({ message, code: CopilotKitErrorCode.NOT_FOUND });
+    const code = CopilotKitErrorCode.NOT_FOUND;
+    const errorMessage = `${message}.\n\n${getSeeMoreMarkdown(ERROR_CONFIG[code].troubleshootingUrl)}`;
+    super({ message: errorMessage, code });
     this.name = ERROR_NAMES.COPILOT_API_DISCOVERY_ERROR;
   }
 }
@@ -110,13 +98,13 @@ export class CopilotKitApiDiscoveryError extends CopilotKitError {
  */
 export class CopilotKitAgentDiscoveryError extends CopilotKitError {
   constructor({ agentName }: { agentName?: string } = {}) {
+    const code = CopilotKitErrorCode.NOT_FOUND;
     const baseMessage = "Failed to find agent";
     const configMessage = "Please verify the agent name exists and is properly configured.";
-    const defaultMessage = `${baseMessage}. ${configMessage}`;
     const finalMessage = agentName
-      ? `${baseMessage} '${agentName}'. ${configMessage}`
-      : defaultMessage;
-    super({ message: finalMessage || finalMessage, code: CopilotKitErrorCode.NOT_FOUND });
+      ? `${baseMessage} '${agentName}'. ${configMessage}\n\n${getSeeMoreMarkdown(ERROR_CONFIG[code].troubleshootingUrl)}`
+      : `${baseMessage}. ${configMessage}\n\n${getSeeMoreMarkdown(ERROR_CONFIG[code].troubleshootingUrl)}`;
+    super({ message: finalMessage || finalMessage, code });
     this.name = ERROR_NAMES.COPILOT_KIT_AGENT_DISCOVERY_ERROR;
   }
 }
@@ -134,27 +122,32 @@ export class CopilotKitAgentDiscoveryError extends CopilotKitError {
  * - Protocol/transport layer errors like SSL/TLS issues
  */
 export class CopilotKitLowLevelError extends CopilotKitError {
-  constructor({ error, url, message }: { error: Error, url: string; message?: string }) {
+  constructor({ error, url, message }: { error: Error; url: string; message?: string }) {
     let code = CopilotKitErrorCode.NETWORK_ERROR;
 
-    const getMessageByCode = (errorCode?: string)=> {
-      switch(errorCode) {
-        case 'ECONNREFUSED':
-          return "Connection was refused. Ensure the server is running and accessible.";
-        case 'ENOTFOUND':
-          return "The server address could not be found. Check the URL or your network configuration.";
-        case 'ETIMEDOUT':
-          return "The connection timed out. The server might be overloaded or taking too long to respond.";
+    const getMessageByCode = (errorCode?: string) => {
+      const troubleshootingLink = ERROR_CONFIG[code].troubleshootingUrl;
+      switch (errorCode) {
+        case "ECONNREFUSED":
+          return `Connection to ${url} was refused. Ensure the server is running and accessible.\n\n${getSeeMoreMarkdown(troubleshootingLink)}`;
+        case "ENOTFOUND":
+          return `The server on ${url} could not be found. Check the URL or your network configuration.\n\n${getSeeMoreMarkdown(ERROR_CONFIG[CopilotKitErrorCode.NOT_FOUND].troubleshootingUrl)}`;
+        case "ETIMEDOUT":
+          return `The connection to ${url} timed out. The server might be overloaded or taking too long to respond.\n\n${getSeeMoreMarkdown(troubleshootingLink)}`;
         default:
-          return `Failed to fetch from url ${url}. Possible reasons:<br/>
-          - The server might be down or unreachable.<br/>
-          - There might be a network issue (e.g., DNS failure, connection timeout).<br/>
-          - The URL might be incorrect.<br/>
-          - The server is not running on the specified port.<br/>`
+          return `Failed to fetch from url ${url}.
+
+Possible reasons:
+- -The server might be down or unreachable
+- -There might be a network issue (e.g., DNS failure, connection timeout) 
+- -The URL might be incorrect
+- -The server is not running on the specified port
+
+${getSeeMoreMarkdown(troubleshootingLink)}`;
       }
-    }
+    };
     // @ts-expect-error -- code may exist
-    const errorMessage = message ?? getMessageByCode(error.code as string)
+    const errorMessage = message ?? getMessageByCode(error.code as string);
 
     super({ message: errorMessage, code });
 
