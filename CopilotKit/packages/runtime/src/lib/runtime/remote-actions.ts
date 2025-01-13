@@ -88,8 +88,9 @@ async function fetchRemoteInfo({
   logger.debug({ url }, "Fetching actions from url");
   const headers = createHeaders(onBeforeRequest, graphqlContext);
 
+  const fetchUrl = `${url}/info`;
   try {
-    const response = await fetch(`${url}/info`, {
+    const response = await fetch(fetchUrl, {
       method: "POST",
       headers,
       body: JSON.stringify({ properties: graphqlContext.properties, frontendUrl }),
@@ -110,7 +111,7 @@ async function fetchRemoteInfo({
     if (error instanceof CopilotKitError) {
       throw error;
     }
-    throw new CopilotKitLowLevelError(error);
+    throw new CopilotKitLowLevelError({ error, url: fetchUrl });
   }
 }
 
