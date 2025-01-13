@@ -10,9 +10,9 @@ export const ERROR_NAMES = {
 
 export enum CopilotKitErrorCode {
   NETWORK_ERROR = "NETWORK_ERROR",
-  INVALID_REQUEST = "INVALID_REQUEST",
-  SERVER_ERROR = "SERVER_ERROR",
   NOT_FOUND = "NOT_FOUND",
+  AGENT_NOT_FOUND = "AGENT_NOT_FOUND",
+  API_NOT_FOUND = "API_NOT_FOUND",
   UNKNOWN = "UNKNOWN",
 }
 
@@ -25,21 +25,20 @@ export const ERROR_CONFIG = {
     statusCode: 503,
     troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
   },
-  [CopilotKitErrorCode.INVALID_REQUEST]: {
-    statusCode: 400,
-    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
-  },
-  [CopilotKitErrorCode.SERVER_ERROR]: {
-    statusCode: 500,
-    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
-  },
   [CopilotKitErrorCode.NOT_FOUND]: {
+    statusCode: 404,
+    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
+  },
+  [CopilotKitErrorCode.AGENT_NOT_FOUND]: {
     statusCode: 500,
+    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
+  },
+  [CopilotKitErrorCode.API_NOT_FOUND]: {
+    statusCode: 404,
     troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
   },
   [CopilotKitErrorCode.UNKNOWN]: {
     statusCode: 500,
-    troubleshootingUrl: `${BASE_URL}#my-messages-are-out-of-order`,
   },
 };
 
@@ -80,7 +79,7 @@ export class CopilotKitError extends GraphQLError {
  */
 export class CopilotKitApiDiscoveryError extends CopilotKitError {
   constructor({ message = "Failed to find CopilotKit API endpoint" }: { message?: string } = {}) {
-    const code = CopilotKitErrorCode.NOT_FOUND;
+    const code = CopilotKitErrorCode.API_NOT_FOUND;
     const errorMessage = `${message}.\n\n${getSeeMoreMarkdown(ERROR_CONFIG[code].troubleshootingUrl)}`;
     super({ message: errorMessage, code });
     this.name = ERROR_NAMES.COPILOT_API_DISCOVERY_ERROR;
@@ -98,7 +97,7 @@ export class CopilotKitApiDiscoveryError extends CopilotKitError {
  */
 export class CopilotKitAgentDiscoveryError extends CopilotKitError {
   constructor({ agentName }: { agentName?: string } = {}) {
-    const code = CopilotKitErrorCode.NOT_FOUND;
+    const code = CopilotKitErrorCode.AGENT_NOT_FOUND;
     const baseMessage = "Failed to find agent";
     const configMessage = "Please verify the agent name exists and is properly configured.";
     const finalMessage = agentName
