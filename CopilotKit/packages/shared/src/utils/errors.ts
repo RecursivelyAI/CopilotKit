@@ -134,29 +134,30 @@ export class CopilotKitAgentDiscoveryError extends CopilotKitError {
  * - Protocol/transport layer errors like SSL/TLS issues
  */
 export class CopilotKitLowLevelError extends CopilotKitError {
-  constructor(error: Error) {
-    let errorMessage = "An error occurred while trying to connect to the server.<br/>";
+  constructor({ error, url, message }: { error: Error, url: string; message?: string }) {
     let code = CopilotKitErrorCode.NETWORK_ERROR;
 
-    if (error instanceof TypeError && error.message.includes("fetch failed")) {
-      errorMessage = `
-        ${errorMessage} Possible reasons:<br/>
+    const getMessageByCode = (errorCode?: string)=> {
+      switch(errorCode) {
+        case 'ECONNREFUSED':
+          return "Connection was refused. Ensure the server is running and accessible.";
+        case 'ENOTFOUND':
+          return "The server address could not be found. Check the URL or your network configuration.";
+        case 'ETIMEDOUT':
+          return "The connection timed out. The server might be overloaded or taking too long to respond.";
+        default:
+          return `Failed to fetch from url ${url}. Possible reasons:<br/>
           - The server might be down or unreachable.<br/>
           - There might be a network issue (e.g., DNS failure, connection timeout).<br/>
           - The URL might be incorrect.<br/>
-          - The server is not running on the specified port.<br/>
-      `;
-    } else if ("code" in error && error.code === "ECONNREFUSED") {
-      errorMessage += " Connection was refused. Ensure the server is running and accessible.";
-    } else if ("code" in error && error.code === "ENOTFOUND") {
-      code = CopilotKitErrorCode.NOT_FOUND;
-      errorMessage +=
-        " The server address could not be found. Check the URL or your network configuration.";
-    } else if ("code" in error && error.code === "ETIMEDOUT") {
-      errorMessage +=
-        " The connection timed out. The server might be overloaded or taking too long to respond.";
+          - The server is not running on the specified port.<br/>`
+      }
     }
+    // @ts-expect-error -- code may exist
+    const errorMessage = message ?? getMessageByCode(error.code as string)
+
     super({ message: errorMessage, code });
+
     this.name = ERROR_NAMES.COPILOT_KIT_LOW_LEVEL_ERROR;
   }
 }
