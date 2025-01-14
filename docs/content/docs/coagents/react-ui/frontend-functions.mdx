@@ -168,7 +168,6 @@ NOTICE that we have a `interrupt_after` for `draft_email_node` (the node that in
 
 ### Define the agent's nodes and orchestrate the workflow using LangGraph.
 
-- Be sure to emit tool calls to the frontend, by using the `copilotkit_customize_config` call with `emit_tool_calls = True`.
 - The frontend's return value will be made available as a tool call result in the subsequent node. Cast the last message to a ToolMessage and look at its `.content`.
 
 <Tabs items={['Python', 'TypeScript']} default="Python">
@@ -178,15 +177,10 @@ NOTICE that we have a `interrupt_after` for `draft_email_node` (the node that in
         from langchain_openai import ChatOpenAI
         from langchain_core.runnables import RunnableConfig
         from langchain_core.messages import HumanMessage, ToolMessage
-        from copilotkit.langchain import copilotkit_customize_config, copilotkit_emit_message
         from pydantic import BaseModel, Field
 
         async def draft_email_node(state: EmailAgentState, config: RunnableConfig):
             """Write an email."""
-            config = copilotkit_customize_config(
-                config,
-                emit_tool_calls=True  # make sure to emit tool calls to the frontend # [!code highlight]
-            )
 
             instructions = "Compose a concise, professional email based on user input."
             email_model = ChatOpenAI(temperature=0, model="gpt-4o").bind_tools([email_tool], tool_choice="email_tool") # [!code highlight:1]
@@ -205,7 +199,6 @@ NOTICE that we have a `interrupt_after` for `draft_email_node` (the node that in
             else:
                 message_to_add = "✅ Sent email."
 
-            await copilotkit_emit_message(config, message_to_add)
             return {
                 "messages": state["messages"] + [AIMessage(content=message_to_add)],
             }
@@ -216,17 +209,11 @@ NOTICE that we have a `interrupt_after` for `draft_email_node` (the node that in
         import { RunnableConfig } from 'langchain/schema/runnable';
         import { ChatOpenAI } from 'langchain/chat_models/openai';
         import { HumanMessage, AIMessage, ToolMessage } from 'langchain/schema';
-        import { copilotKitCustomizeConfig, copilotKitEmitMessage } from '@copilotkit/sdk-js/langchain';
 
         async function draftEmailNode(state: EmailAgentState, config: RunnableConfig) {
-            const modifiedConfig = copilotKitCustomizeConfig(
-                config,
-                { emitToolCalls: true } // [!code highlight]
-            );
-
             const instructions = "Compose a concise, professional email based on user input.";
             const emailModel = new ChatOpenAI({ temperature: 0, modelName: "gpt-4" }).bindTools([emailTool], { tool_choice: "EmailTool" });  [!code highlight:1]
-            const response = await emailModel.invoke([...state.messages, new HumanMessage({ content: instructions })], modifiedConfig);
+            const response = await emailModel.invoke([...state.messages, new HumanMessage({ content: instructions })], config);
             const toolCalls = response.toolCalls;
             const emailDraft = toolCalls?.[0]?.args.email_draft;
             return { email: emailDraft };
@@ -242,7 +229,6 @@ NOTICE that we have a `interrupt_after` for `draft_email_node` (the node that in
                 messageToAdd = "✅ Sent email.";
             }
 
-            await copilotKitEmitMessage(config, messageToAdd);
             return {
                 messages: [...state.messages, new AIMessage({ content: messageToAdd })]
             };

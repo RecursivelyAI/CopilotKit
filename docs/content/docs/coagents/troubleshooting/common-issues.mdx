@@ -25,26 +25,6 @@ tool calls in a more complex example.
 If you have already done that, you can check the following:
 
 <Accordions>
-    <Accordion title="You have not specified the tool call in the `copilotkit_customize_config`">
-        In your LangGraph agent, you have must specify which tool calls will be emitted to the CopilotKit runtime. By default,
-        only streamed messages are emitted. You can fix this by adding the following to the node making the tool call.
-
-        ```python
-        from copilotkit.langchain import copilotkit_customize_config, copilotkit_emit_message
-        from langgraph_core.runnables import RunnableConfig
-        from langchain.tools import tool
-
-        @tool
-        def say_hello_to(name: str) -> str:
-            return f"Hello, {name}!"
-
-        async def my_node(state: State, config: RunnableConfig) -> State:
-            # ...
-            config = copilotkit_customize_config(config, emit_tool_calls=["say_hello_to"]) # [code highlight]
-            # ...
-            return state
-        ```
-    </Accordion>
     <Accordion title="You're using llm.invoke() instead of llm.ainvoke()">
         <p>
             When you invoke your LangGraph agent, you can invoke it synchronously or asynchronously. If you invoke it synchronously,
@@ -52,7 +32,6 @@ If you have already done that, you can check the following:
             the tool calls will be streamed progressively.
 
             ```python
-            config = copilotkit_customize_config(config, emit_tool_calls=["say_hello_to"])
             response = await llm_with_tools.ainvoke(
                 [ SystemMessage(content=system_message), *state["messages"] ],
                 config=config

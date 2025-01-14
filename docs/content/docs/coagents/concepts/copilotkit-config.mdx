@@ -23,9 +23,8 @@ config = copilotkit_customize_config(
 ```
 
 ## Emitting Tool Calls
-Emission of tool calls are off by default. This means that tool calls will not be sent to Copilotkit for processing and rendering.
-However, within a node you can extend the LangGraph `config` object to emit tool calls to Copilotkit. This is useful in situations
-where you may to emit what a potential tool call will look like prior to being executed.
+Emission of tool calls are on by default. This means that all tool calls will be sent to Copilotkit for processing and rendering.
+However, within a node you can extend the LangGraph `config` object to only emit specific tool calls or no tool calls at all to Copilotkit.
 
 ```python
 config = copilotkit_customize_config(
