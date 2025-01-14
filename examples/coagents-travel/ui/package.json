@@ -9,10 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@copilotkit/react-core": "1.5.0",
-    "@copilotkit/react-ui": "1.5.0",
-    "@copilotkit/runtime": "1.5.0",
-    "@copilotkit/runtime-client-gql": "1.5.0",
+    "@copilotkit/react-core": "1.5.11",
+    "@copilotkit/react-ui": "1.5.11",
+    "@copilotkit/runtime": "1.5.11",
+    "@copilotkit/runtime-client-gql": "1.5.11",
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",

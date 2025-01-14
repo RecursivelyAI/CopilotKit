@@ -9,12 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@copilotkit/react-core": "1.5.0",
-    "@copilotkit/react-textarea": "1.5.0",
-    "@copilotkit/react-ui": "1.5.0",
-    "@copilotkit/runtime": "1.5.0",
-    "@copilotkit/runtime-client-gql": "1.5.0",
-    "@copilotkit/shared": "1.5.0",
+    "@copilotkit/react-core": "1.5.11",
+    "@copilotkit/react-textarea": "1.5.11",
+    "@copilotkit/react-ui": "1.5.11",
+    "@copilotkit/runtime": "1.5.11",
+    "@copilotkit/runtime-client-gql": "1.5.11",
+    "@copilotkit/shared": "1.5.11",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-slot": "^1.1.0",

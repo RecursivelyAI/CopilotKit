@@ -13,17 +13,17 @@ importers:
   .:
     dependencies:
       '@copilotkit/react-core':
-        specifier: 1.5.0
-        version: 1.5.0(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 1.5.11
+        version: 1.5.11(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@copilotkit/react-ui':
-        specifier: 1.5.0
-        version: 1.5.0(@types/react@19.0.1)(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 1.5.11
+        version: 1.5.11(@types/react@19.0.1)(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@copilotkit/runtime':
-        specifier: 1.5.0
-        version: 1.5.0(class-validator@0.14.1)(google-auth-library@8.9.0)
+        specifier: 1.5.11
+        version: 1.5.11(class-validator@0.14.1)(google-auth-library@8.9.0)
       '@copilotkit/runtime-client-gql':
-        specifier: 1.5.0
-        version: 1.5.0(graphql@16.9.0)(react@18.3.1)
+        specifier: 1.5.11
+        version: 1.5.11(graphql@16.9.0)(react@18.3.1)
       '@radix-ui/react-accordion':
         specifier: ^1.2.1
         version: 1.2.1(@types/react-dom@19.0.2(@types/react@19.0.1))(@types/react@19.0.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -152,27 +152,27 @@ packages:
     resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
     engines: {node: '>=6.9.0'}
 
-  '@copilotkit/react-core@1.5.0':
-    resolution: {integrity: sha512-N8fmNsZfEQJpRAR4C35FEfMNkfZdPdXbxdWfShtiV1QZNIUCVFog//IjLlCvPuzzRdQrRkSmDKSwDdEYYzR4gw==}
+  '@copilotkit/react-core@1.5.11':
+    resolution: {integrity: sha512-aa3tHH5VCoZ3s2uvPSwiRPj/Lzh3i3CEUIjh3rBmIJ+BJlx90FnTPY6I3QGnzPyld6591+/qxq7AVZ5woi5ZdA==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/react-ui@1.5.0':
-    resolution: {integrity: sha512-xYtGN5kA21YxbHYI2E6lk8mNB389jkc6lZxKZkOCDZ+g6fNWV0r0NVkMWkaGD6SkeikvFdTIwszJ+6KpnTRRWw==}
+  '@copilotkit/react-ui@1.5.11':
+    resolution: {integrity: sha512-ytGI+Gv4NGJguuOZidROpvjMqqqogG29FN2841kiDG4AShF4Oqv6cMhRenexysNUuTkwN6RSmizghw5v0Rag9A==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/runtime-client-gql@1.5.0':
-    resolution: {integrity: sha512-hNYdDLDEqVHi8EFOLQr3gdtjgZ2iMKbXLKpbqWTRsVyVa6FIlPb1Gvs2P1THlMSs6xGqs/NO5VSQJqNBsbDb3Q==}
+  '@copilotkit/runtime-client-gql@1.5.11':
+    resolution: {integrity: sha512-WajWAjyoYxGsfG2igR32UrXa2eR+16frEIgJOJmuaImg6rpkK9OWZjZhIjE0KbsN+ZLtFM4uZpvYoakhurRiTw==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/runtime@1.5.0':
-    resolution: {integrity: sha512-zjMs0OsmxsuPQwWgC2gVB5UFAzOOKCKt0hwTvnmBzNWBYvTS/DPGLcv5r0h06TMCw2TaLELZqnNmT8gulVcIiA==}
+  '@copilotkit/runtime@1.5.11':
+    resolution: {integrity: sha512-scoMLEQ27Shp7jzP0LNVIPZCnKBPMJxNC8Ih9G1iUvpJ2+/6HfHv/aYqzKXfoHGuqfGyDfYOG8VHn6Pj6CB0sg==}
 
-  '@copilotkit/shared@1.5.0':
-    resolution: {integrity: sha512-MkoEFAln8Cpdn9rCjeD61hBm8kN87dnXcYlfdPSczHCkVPMozloSWAwnoNVBpjDNDAJSJTAFQpLWMUarCGkyZA==}
+  '@copilotkit/shared@1.5.11':
+    resolution: {integrity: sha512-sLLCT7L/VgB5LA4TPVJ5MtRXA7BzlRso3SRrRoUfatHI1IoAQ/fKR/YypuEZNOA2fj1MIDSrKN+wAaXMLwXI3A==}
 
   '@envelop/core@5.0.2':
     resolution: {integrity: sha512-tVL6OrMe6UjqLosiE+EH9uxh2TQC0469GwF4tE014ugRaDDKKVWwFwZe0TBMlcyHKh5MD4ZxktWo/1hqUxIuhw==}
@@ -4044,10 +4044,10 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
-  '@copilotkit/react-core@1.5.0(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@copilotkit/react-core@1.5.11(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@copilotkit/runtime-client-gql': 1.5.0(graphql@16.9.0)(react@18.3.1)
-      '@copilotkit/shared': 1.5.0
+      '@copilotkit/runtime-client-gql': 1.5.11(graphql@16.9.0)(react@18.3.1)
+      '@copilotkit/shared': 1.5.11
       '@scarf/scarf': 1.4.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -4056,11 +4056,11 @@ snapshots:
       - encoding
       - graphql
 
-  '@copilotkit/react-ui@1.5.0(@types/react@19.0.1)(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@copilotkit/react-ui@1.5.11(@types/react@19.0.1)(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@copilotkit/react-core': 1.5.0(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@copilotkit/runtime-client-gql': 1.5.0(graphql@16.9.0)(react@18.3.1)
-      '@copilotkit/shared': 1.5.0
+      '@copilotkit/react-core': 1.5.11(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@copilotkit/runtime-client-gql': 1.5.11(graphql@16.9.0)(react@18.3.1)
+      '@copilotkit/shared': 1.5.11
       '@headlessui/react': 2.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-markdown: 8.0.7(@types/react@19.0.1)(react@18.3.1)
@@ -4074,9 +4074,9 @@ snapshots:
       - react-dom
       - supports-color
 
-  '@copilotkit/runtime-client-gql@1.5.0(graphql@16.9.0)(react@18.3.1)':
+  '@copilotkit/runtime-client-gql@1.5.11(graphql@16.9.0)(react@18.3.1)':
     dependencies:
-      '@copilotkit/shared': 1.5.0
+      '@copilotkit/shared': 1.5.11
       '@urql/core': 5.0.8(graphql@16.9.0)
       react: 18.3.1
       untruncate-json: 0.0.1
@@ -4085,10 +4085,10 @@ snapshots:
       - encoding
       - graphql
 
-  '@copilotkit/runtime@1.5.0(class-validator@0.14.1)(google-auth-library@8.9.0)':
+  '@copilotkit/runtime@1.5.11(class-validator@0.14.1)(google-auth-library@8.9.0)':
     dependencies:
       '@anthropic-ai/sdk': 0.27.3
-      '@copilotkit/shared': 1.5.0
+      '@copilotkit/shared': 1.5.11
       '@graphql-yoga/plugin-defer-stream': 3.10.3(graphql-yoga@5.10.3(graphql@16.9.0))(graphql@16.9.0)
       '@langchain/community': 0.0.53(google-auth-library@8.9.0)(openai@4.73.0(zod@3.23.8))
       '@langchain/core': 0.3.18(openai@4.73.0(zod@3.23.8))
@@ -4219,7 +4219,7 @@ snapshots:
       - web-auth-library
       - ws
 
-  '@copilotkit/shared@1.5.0':
+  '@copilotkit/shared@1.5.11':
     dependencies:
       '@segment/analytics-node': 2.2.0
       chalk: 4.1.2
