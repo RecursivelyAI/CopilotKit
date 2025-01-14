@@ -29,7 +29,7 @@
     "unlink:global": "pnpm unlink --global"
   },
   "devDependencies": {
-    "@swc/core": "1.5.28",
+    "@swc/core": "1.10.7",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.4",
     "@types/node": "^18.11.17",
@@ -46,20 +46,20 @@
     "zod-to-json-schema": "^3.23.5"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.27.3",
+    "@anthropic-ai/sdk": "^0.33.0",
     "@copilotkit/shared": "workspace:*",
     "@graphql-yoga/plugin-defer-stream": "^3.3.1",
-    "@langchain/community": "^0.0.53",
+    "@langchain/community": "^0.3.0",
     "@langchain/core": "^0.3.13",
     "@langchain/google-gauth": "^0.1.0",
-    "@langchain/langgraph-sdk": "^0.0.16",
-    "@langchain/openai": "^0.0.28",
+    "@langchain/langgraph-sdk": "^0.0.36",
+    "@langchain/openai": "^0.3.0",
     "class-transformer": "^0.5.1",
     "express": "^4.19.2",
     "graphql": "^16.8.1",
     "graphql-scalars": "^1.23.0",
     "graphql-yoga": "^5.3.1",
-    "groq-sdk": "^0.5.0",
+    "groq-sdk": "^0.12.0",
     "langchain": "^0.3.3",
     "openai": "^4.50.0",
     "partial-json": "^0.1.7",
@@ -67,7 +67,7 @@
     "pino-pretty": "^11.2.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "type-graphql": "2.0.0-rc.1",
+    "type-graphql": "2.0.0-rc.2",
     "zod": "^3.23.3"
   },
   "keywords": [
