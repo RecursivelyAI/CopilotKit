@@ -140,6 +140,7 @@ export type FrontendAction<
   disabled?: boolean;
   available?: FrontendActionAvailability;
   followUp?: boolean;
+  retryOnFailure?: boolean;
 } & (
     | {
         render?:

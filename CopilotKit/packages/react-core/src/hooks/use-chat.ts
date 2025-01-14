@@ -452,10 +452,20 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
               let result: any;
               try {
                 result = await Promise.race([
-                  onFunctionCall({
-                    messages: previousMessages,
-                    name: message.name,
-                    args: message.arguments,
+                  new Promise(async (resolve) => {
+                    const retryStrategy = action.retryOnFailure ? "Try again" : "Do not try again";
+                    try {
+                      const result = await onFunctionCall({
+                        messages: previousMessages,
+                        name: message.name,
+                        args: message.arguments,
+                      });
+                      resolve(result);
+                    } catch (error) {
+                      resolve(
+                        `Failed to execute action ${message.name}, User chosen retry strategy: ${retryStrategy}`,
+                      );
+                    }
                   }),
                   new Promise((resolve) =>
                     chatAbortControllerRef.current?.signal.addEventListener("abort", () =>

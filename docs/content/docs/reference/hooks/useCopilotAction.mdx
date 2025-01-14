@@ -79,6 +79,10 @@ This hooks enables you to dynamically generate UI elements and render them in th
         Whether to report the result of a function call to the LLM which will then provide a follow-up response. Pass `false` to disable
     </PropertyReference>
 
+    <PropertyReference name="retryOnFailure" type="boolean" default="false">
+        Whether to retry the action when failed. If set to `true`. The LLM will retry as it sees fit.
+    </PropertyReference>
+
     <PropertyReference name="parameters" type="Parameter[]">
       The parameters of the action. See [Parameter](#parameter).
 
