@@ -36,5 +36,6 @@ class ResultMessage(Message):
 class IntermediateStateConfig(TypedDict):
     """Intermediate state config"""
     state_key: str
-    tool: str
+    tool: NotRequired[str]
     tool_argument: NotRequired[str]
+    direct_output: NotRequired[bool]
