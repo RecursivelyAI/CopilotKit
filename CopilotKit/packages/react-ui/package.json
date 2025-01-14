@@ -51,7 +51,8 @@
     "ts-jest": "^29.1.1",
     "tsconfig": "workspace:*",
     "tsup": "^6.7.0",
-    "typescript": "^5.2.3"
+    "typescript": "^5.2.3",
+    "@types/semver": "^7.5.8"
   },
   "dependencies": {
     "@copilotkit/react-core": "workspace:*",
@@ -61,7 +62,8 @@
     "react-markdown": "^8.0.7",
     "react-syntax-highlighter": "^15.5.0",
     "remark-gfm": "^3.0.1",
-    "remark-math": "^5.1.1"
+    "remark-math": "^5.1.1",
+    "semver": "^7.6.3"
   },
   "keywords": [
     "copilotkit",

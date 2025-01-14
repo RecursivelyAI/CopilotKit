@@ -20,6 +20,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { COPILOTKIT_VERSION } from "@copilotkit/shared";
 import { SmallSpinnerIcon } from "../chat/Icons";
 import { CopilotKitHelpModal } from "../help-modal";
+import semver from "semver";
 
 type VersionStatus = "unknown" | "checking" | "latest" | "update-available" | "outdated";
 
@@ -50,14 +51,13 @@ export function CopilotDevConsole() {
     getPublishedCopilotKitVersion(currentVersion, force)
       .then((v) => {
         setLatestVersion(v.latest);
-        let versionOk = false;
-
-        // match exact version or a version with a letter (e.g. 1.0.0-alpha.1)
-        if (v.current === v.latest) {
-          versionOk = true;
-        } else if (/[a-zA-Z]/.test(v.current)) {
-          versionOk = true;
-        }
+        const versionOk = (() => {
+          if (!semver.valid(v.current) || !semver.valid(v.latest)) {
+            return v.current === v.latest;
+          }
+          // If current is >= latest, we’re good
+          return semver.gte(v.current, v.latest);
+        })();
 
         if (versionOk) {
           setVersionStatus("latest");
