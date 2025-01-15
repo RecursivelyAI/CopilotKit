@@ -11,6 +11,11 @@ import {
   constructRemoteActions,
   createHeaders,
 } from "./remote-action-constructors";
+import {
+  CopilotKitLowLevelError,
+  ResolvedCopilotKitError,
+  CopilotKitError,
+} from "@copilotkit/shared";
 
 export type EndpointDefinition = CopilotKitEndpoint | LangGraphPlatformEndpoint;
 
@@ -83,8 +88,9 @@ async function fetchRemoteInfo({
   logger.debug({ url }, "Fetching actions from url");
   const headers = createHeaders(onBeforeRequest, graphqlContext);
 
+  const fetchUrl = `${url}/info`;
   try {
-    const response = await fetch(`${url}/info`, {
+    const response = await fetch(fetchUrl, {
       method: "POST",
       headers,
       body: JSON.stringify({ properties: graphqlContext.properties, frontendUrl }),
@@ -95,18 +101,17 @@ async function fetchRemoteInfo({
         { url, status: response.status, body: await response.text() },
         "Failed to fetch actions from url",
       );
-      return { actions: [], agents: [] };
+      throw new ResolvedCopilotKitError({ status: response.status });
     }
 
     const json = await response.json();
     logger.debug({ json }, "Fetched actions from url");
     return json;
   } catch (error) {
-    logger.error(
-      { error: error.message ? error.message : error + "" },
-      "Failed to fetch actions from url",
-    );
-    return { actions: [], agents: [] };
+    if (error instanceof CopilotKitError) {
+      throw error;
+    }
+    throw new CopilotKitLowLevelError({ error, url: fetchUrl });
   }
 }
 

@@ -16,22 +16,20 @@ import {
 import { generateCopilotResponseMutation } from "../graphql/definitions/mutations";
 import { getAvailableAgentsQuery } from "../graphql/definitions/queries";
 import { OperationResultSource, OperationResult } from "urql";
+import { CopilotKitLowLevelError, ResolvedCopilotKitError } from "@copilotkit/shared";
 
 const createFetchFn =
   (signal?: AbortSignal) =>
   async (...args: Parameters<typeof fetch>) => {
-    const result = await fetch(args[0], { ...(args[1] ?? {}), signal });
-    if (result.status !== 200) {
-      switch (result.status) {
-        case 404:
-          throw new Error(
-            "Runtime URL seems to be invalid - got 404 response. Please check the runtimeUrl passed to CopilotKit",
-          );
-        default:
-          throw new Error("Could not fetch copilot response");
+    try {
+      const result = await fetch(args[0], { ...(args[1] ?? {}), signal });
+      if (result.status !== 200) {
+        throw new ResolvedCopilotKitError({ status: result.status });
       }
+      return result;
+    } catch (error) {
+      throw new CopilotKitLowLevelError({ error: error as Error, url: args[0] as string });
     }
-    return result;
   };
 
 export interface CopilotRuntimeClientOptions {

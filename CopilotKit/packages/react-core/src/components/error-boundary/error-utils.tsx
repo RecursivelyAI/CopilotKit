@@ -1,14 +1,19 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { GraphQLError } from "@copilotkit/runtime-client-gql";
 import { useToast } from "../toast/toast-provider";
 import { ExclamationMarkIcon } from "../toast/exclamation-mark-icon";
+import ReactMarkdown from "react-markdown";
+
+interface OriginalError {
+  message?: string;
+  stack?: string;
+}
 
 export function ErrorToast({ errors }: { errors: (Error | GraphQLError)[] }) {
   const errorsToRender = errors.map((error, idx) => {
-    const message =
-      "extensions" in error
-        ? (error.extensions?.originalError as undefined | { message?: string })?.message
-        : error.message;
+    const originalError =
+      "extensions" in error ? (error.extensions?.originalError as undefined | OriginalError) : {};
+    const message = originalError?.message ?? error.message;
     const code = "extensions" in error ? (error.extensions?.code as string) : null;
 
     return (
@@ -32,7 +37,7 @@ export function ErrorToast({ errors }: { errors: (Error | GraphQLError)[] }) {
             <span style={{ fontFamily: "monospace", fontWeight: "normal" }}>{code}</span>
           </div>
         )}
-        <div>{message}</div>
+        <ReactMarkdown>{message}</ReactMarkdown>
       </div>
     );
   });
