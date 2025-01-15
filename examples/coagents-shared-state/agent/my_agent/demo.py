@@ -7,12 +7,12 @@ load_dotenv() # pylint: disable=wrong-import-position
 from fastapi import FastAPI
 import uvicorn
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
-from copilotkit import CopilotKitSDK, LangGraphAgent
+from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
 from my_agent.agent import graph
 
 
 app = FastAPI()
-sdk = CopilotKitSDK(
+sdk = CopilotKitRemoteEndpoint(
     agents=[
         LangGraphAgent(
             name="translate_agent",

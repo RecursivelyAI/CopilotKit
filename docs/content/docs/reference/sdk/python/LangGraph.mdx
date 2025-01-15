@@ -1,0 +1,203 @@
+---
+title: "LangGraph SDK"
+description: "The CopilotKit LangGraph SDK for Python allows you to build and run LangGraph workflows with CopilotKit."
+---
+
+{
+ /*
+  * ATTENTION! DO NOT MODIFY THIS FILE!
+  * This page is auto-generated. If you want to make any changes to this page, changes must be made at:
+  * CopilotKit/../sdk-python/copilotkit/langgraph.py
+  */
+}
+## copilotkit_customize_config
+
+Customize the LangGraph configuration for use in CopilotKit.
+
+    To the CopilotKit SDK, run:
+
+    ```bash
+    pip install copilotkit
+    ```
+
+    ### Examples
+
+    Disable emitting messages and tool calls:
+    
+    ```python
+    from copilotkit.langgraph import copilotkit_customize_config
+
+    config = copilotkit_customize_config(
+        config,
+        emit_messages=False,
+        emit_tool_calls=False
+    )
+    ```
+
+    To emit a tool call as streaming LangGraph state, pass the destination key in state,
+    the tool name and optionally the tool argument. (If you don't pass the argument name,
+    all arguments are emitted under the state key.)
+
+    ```python
+    from copilotkit.langgraph import copilotkit_customize_config
+
+    config = copilotkit_customize_config(
+        config,
+        emit_intermediate_state=[
+           {
+                "state_key": "steps",
+                "tool": "SearchTool",
+                "tool_argument": "steps"
+            },
+        ]
+    )
+    ```
+
+### Parameters
+
+<PropertyReference name="base_config" type="Optional[RunnableConfig]" > 
+The LangChain/LangGraph configuration to customize. Pass None to make a new configuration.
+</PropertyReference>
+
+<PropertyReference name="emit_messages" type="Optional[bool]" > 
+Configure how messages are emitted. By default, all messages are emitted. Pass False to disable emitting messages.
+</PropertyReference>
+
+<PropertyReference name="emit_tool_calls" type="Optional[Union[bool, str, List[str]]]" > 
+Configure how tool calls are emitted. By default, all tool calls are emitted. Pass False to disable emitting tool calls. Pass a string or list of strings to emit only specific tool calls.
+</PropertyReference>
+
+<PropertyReference name="emit_intermediate_state" type="Optional[List[IntermediateStateConfig]]" > 
+Lets you emit tool calls as streaming LangGraph state.
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="RunnableConfig">
+The customized LangGraph configuration.
+</PropertyReference>
+
+## copilotkit_exit
+
+Exits the current agent after the run completes. Calling copilotkit_exit() will
+    not immediately stop the agent. Instead, it signals to CopilotKit to stop the agent after
+    the run completes.
+
+    ### Examples
+
+    ```python
+    from copilotkit.langgraph import copilotkit_exit
+
+    def my_node(state: Any):
+        await copilotkit_exit(config)
+        return state
+    ```
+
+### Parameters
+
+<PropertyReference name="config" type="RunnableConfig" required> 
+The LangGraph configuration.
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="Awaitable[bool]">
+Always return True.
+</PropertyReference>
+
+## copilotkit_emit_state
+
+Emits intermediate state to CopilotKit. Useful if you have a longer running node and you want to
+    update the user with the current state of the node.
+
+    ### Examples
+
+    ```python
+    from copilotkit.langgraph import copilotkit_emit_state
+
+    for i in range(10):
+        await some_long_running_operation(i)
+        await copilotkit_emit_state(config, {"progress": i})
+    ```
+
+### Parameters
+
+<PropertyReference name="config" type="RunnableConfig" required> 
+The LangGraph configuration.
+</PropertyReference>
+
+<PropertyReference name="state" type="Any" required> 
+The state to emit (Must be JSON serializable).
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="Awaitable[bool]">
+Always return True.
+</PropertyReference>
+
+## copilotkit_emit_message
+
+Manually emits a message to CopilotKit. Useful in longer running nodes to update the user.
+    Important: You still need to return the messages from the node.
+
+    ### Examples
+
+    ```python
+    from copilotkit.langgraph import copilotkit_emit_message
+
+    message = "Step 1 of 10 complete"
+    await copilotkit_emit_message(config, message)
+
+    # Return the message from the node
+    return {
+        "messages": [AIMessage(content=message)]
+    }
+    ```
+
+### Parameters
+
+<PropertyReference name="config" type="RunnableConfig" required> 
+The LangGraph configuration.
+</PropertyReference>
+
+<PropertyReference name="message" type="str" required> 
+The message to emit.
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="Awaitable[bool]">
+Always return True.
+</PropertyReference>
+
+## copilotkit_emit_tool_call
+
+Manually emits a tool call to CopilotKit.
+
+    ```python
+    from copilotkit.langgraph import copilotkit_emit_tool_call
+
+    await copilotkit_emit_tool_call(config, name="SearchTool", args={"steps": 10})
+    ```
+
+### Parameters
+
+<PropertyReference name="config" type="RunnableConfig" required> 
+The LangGraph configuration.
+</PropertyReference>
+
+<PropertyReference name="name" type="str" required> 
+The name of the tool to emit.
+</PropertyReference>
+
+<PropertyReference name="args" type="Dict[str, Any]" required> 
+The arguments to emit.
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="Awaitable[bool]">
+Always return True.
+</PropertyReference>
+

@@ -16,7 +16,7 @@ In your agent's workflow, you'll want to ask the user specific questions or prom
     <Tab value="Python">
         ```python
         rom langchain_core.messages import AIMessage
-        from copilotkit.langchain import copilotkit_emit_message
+        from copilotkit.langgraph import copilotkit_emit_message
 
         # ...
 
@@ -39,7 +39,7 @@ In your agent's workflow, you'll want to ask the user specific questions or prom
     <Tab value="TypeScript">
         ```typescript
         import { AIMessage } from "@langchain/core/messages";
-        import { copilotKitEmitMessage } from "@copilotkit/sdk-js/langchain";
+        import { copilotkitEmitMessage } from "@copilotkit/sdk-js/langgraph";
 
         // ...
 
@@ -50,7 +50,7 @@ In your agent's workflow, you'll want to ask the user specific questions or prom
 
             const content = "Hey, what is your name? 🙂";
 
-            await copilotKitEmitMessage(config, content);
+            await copilotkitEmitMessage(config, content);
 
             // do something long running here...
 

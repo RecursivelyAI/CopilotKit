@@ -11,7 +11,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import MessagesState
-from copilotkit.langchain import copilotkit_customize_config
+from copilotkit.langgraph import copilotkit_customize_config
 
 class Translations(TypedDict):
     """Contains the translations in four different languages."""

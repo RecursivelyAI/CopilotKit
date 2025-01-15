@@ -89,7 +89,7 @@ The Tool's name and arguments must line up with what you used on the frontend.
     <Tab value="TypeScript">
         ```typescript
         import { Annotation } from "@langchain/langgraph";
-        import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langchain";
+        import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
         import { tool } from "@langchain/core/tools";
         import { z } from "zod";
 
@@ -178,7 +178,7 @@ NOTICE that we have a `interrupt_after` for `draft_email_node` (the node that in
         from langchain_openai import ChatOpenAI
         from langchain_core.runnables import RunnableConfig
         from langchain_core.messages import HumanMessage, ToolMessage
-        from copilotkit.langchain import copilotkit_customize_config, copilotkit_emit_message
+        from copilotkit.langgraph import copilotkit_customize_config, copilotkit_emit_message
         from pydantic import BaseModel, Field
 
         async def draft_email_node(state: EmailAgentState, config: RunnableConfig):
@@ -216,10 +216,10 @@ NOTICE that we have a `interrupt_after` for `draft_email_node` (the node that in
         import { RunnableConfig } from 'langchain/schema/runnable';
         import { ChatOpenAI } from 'langchain/chat_models/openai';
         import { HumanMessage, AIMessage, ToolMessage } from 'langchain/schema';
-        import { copilotKitCustomizeConfig, copilotKitEmitMessage } from '@copilotkit/sdk-js/langchain';
+        import { copilotkitCustomizeConfig, copilotkitEmitMessage } from '@copilotkit/sdk-js/langgraph';
 
         async function draftEmailNode(state: EmailAgentState, config: RunnableConfig) {
-            const modifiedConfig = copilotKitCustomizeConfig(
+            const modifiedConfig = copilotkitCustomizeConfig(
                 config,
                 { emitToolCalls: true } // [!code highlight]
             );
@@ -242,7 +242,7 @@ NOTICE that we have a `interrupt_after` for `draft_email_node` (the node that in
                 messageToAdd = "✅ Sent email.";
             }
 
-            await copilotKitEmitMessage(config, messageToAdd);
+            await copilotkitEmitMessage(config, messageToAdd);
             return {
                 messages: [...state.messages, new AIMessage({ content: messageToAdd })]
             };

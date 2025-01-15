@@ -1,5 +1,5 @@
 import { Annotation } from "@langchain/langgraph";
-import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langchain";
+import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 
 // Define the AgentState annotation, extending MessagesState
 export const AgentStateAnnotation = Annotation.Root({

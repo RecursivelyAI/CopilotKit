@@ -24,6 +24,3 @@ toml = "^0.10.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-demo = "copilotkit.demos.research_canvas.demo:main"

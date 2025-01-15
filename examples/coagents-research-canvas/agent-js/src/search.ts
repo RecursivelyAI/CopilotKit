@@ -18,9 +18,9 @@ import {
 } from "@langchain/core/messages";
 import { getModel } from "./model";
 import {
-  copilotKitCustomizeConfig,
-  copilotKitEmitState,
-} from "@copilotkit/sdk-js/langchain";
+  copilotkitCustomizeConfig,
+  copilotkitEmitState,
+} from "@copilotkit/sdk-js/langgraph";
 
 const ResourceInput = z.object({
   url: z.string().describe("The URL of the resource"),
@@ -55,7 +55,7 @@ export async function search_node(state: AgentState, config: RunnableConfig) {
     });
   }
   const { messages, ...restOfState } = state;
-  await copilotKitEmitState(config, {
+  await copilotkitEmitState(config, {
     ...restOfState,
     logs,
     resources,
@@ -68,7 +68,7 @@ export async function search_node(state: AgentState, config: RunnableConfig) {
     const response = await tavilyClient.search(query, {});
     search_results.push(response);
     logs[i]["done"] = true;
-    await copilotKitEmitState(config, {
+    await copilotkitEmitState(config, {
       ...restOfState,
       logs,
       resources,
@@ -87,7 +87,7 @@ export async function search_node(state: AgentState, config: RunnableConfig) {
     name: "Search",
   });
 
-  const customConfig = copilotKitCustomizeConfig(config, {
+  const customConfig = copilotkitCustomizeConfig(config, {
     emitIntermediateState: [
       {
         stateKey: "resources",
@@ -105,7 +105,7 @@ export async function search_node(state: AgentState, config: RunnableConfig) {
 
   logs = [];
 
-  await copilotKitEmitState(config, {
+  await copilotkitEmitState(config, {
     ...restOfState,
     resources,
     logs,

@@ -5,11 +5,9 @@ from langchain_openai import ChatOpenAI
 from travel.search import search_for_places
 from travel.trips import add_trips, update_trips, delete_trips
 from langchain_core.runnables import RunnableConfig
-from copilotkit.langchain import copilotkit_customize_config
 from langchain_core.messages import AIMessage, ToolMessage
 from typing import cast
 from langchain_core.tools import tool
-from copilotkit.langchain import copilotkit_emit_message
 
 @tool
 def select_trip(trip_id: str):

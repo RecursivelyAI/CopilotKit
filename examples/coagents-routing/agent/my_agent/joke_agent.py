@@ -9,7 +9,7 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import SystemMessage, ToolMessage
 
 
-from copilotkit.langchain import copilotkit_customize_config, copilotkit_exit
+from copilotkit.langgraph import copilotkit_customize_config, copilotkit_exit
 from pydantic import BaseModel, Field
 from my_agent.model import get_model
 

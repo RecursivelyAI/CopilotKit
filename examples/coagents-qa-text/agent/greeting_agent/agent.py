@@ -5,7 +5,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import HumanMessage, AIMessage
-from copilotkit.langchain import (
+from copilotkit.langgraph import (
     copilotkit_exit,
     copilotkit_customize_config
 )

@@ -9,7 +9,7 @@ from datetime import datetime
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import RunnableConfig
 from langchain.tools import tool
-from copilotkit.langchain import copilotkit_customize_config
+from copilotkit.langgraph import copilotkit_customize_config
 from pydantic import BaseModel, Field
 from ai_researcher.state import AgentState
 from ai_researcher.model import get_model

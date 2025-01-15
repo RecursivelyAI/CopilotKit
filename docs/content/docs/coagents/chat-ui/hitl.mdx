@@ -175,7 +175,7 @@ your code into multiple files if you'd like.
     <Tab value="TypeScript">
       ```typescript title="agent/my_agent/agent.ts"
       import { Annotation } from "@langchain/langgraph";
-      import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langchain";
+      import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 
       export const EmailAgentStateAnnotation = Annotation.Root({
           email: Annotation<string>,
@@ -245,7 +245,7 @@ First, let's build the `email_node`.
         // [!code highlight:7]
         import {
           convertActionsToDynamicStructuredTools,
-        } from "@copilotkit/sdk-js/langchain";
+        } from "@copilotkit/sdk-js/langgraph";
 
         // ...
 
@@ -326,7 +326,7 @@ This node will be responsible for actually sending the email once the user has a
         // [!code highlight:3]
         import {
           convertActionsToDynamicStructuredTools,
-        } from "@copilotkit/sdk-js/langchain";
+        } from "@copilotkit/sdk-js/langgraph";
 
         // ...
 

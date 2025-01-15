@@ -7,9 +7,9 @@ import { z } from "zod";
 import { AgentState, AgentStateAnnotation } from "./state";
 import { RunnableConfig } from "@langchain/core/runnables";
 import {
-  copilotKitCustomizeConfig,
-  copilotKitExit,
-} from "@copilotkit/sdk-js/langchain";
+  copilotkitCustomizeConfig,
+  copilotkitExit,
+} from "@copilotkit/sdk-js/langgraph";
 import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import { getModel } from "./model";
 import { END, MemorySaver, StateGraph } from "@langchain/langgraph";
@@ -48,7 +48,7 @@ export async function extract_name_node(
 
   const response = await model.invoke(
     [...state.messages, new HumanMessage({ content: instructions })],
-    copilotKitCustomizeConfig(config, { emitToolCalls: false })
+    copilotkitCustomizeConfig(config, { emitToolCalls: false })
   );
 
   const toolCalls = response.tool_calls;
@@ -71,7 +71,7 @@ export async function extract_name_node(
 }
 
 export async function greet_node(state: AgentState, config: RunnableConfig) {
-  await copilotKitExit(config);
+  await copilotkitExit(config);
 
   return {
     messages: new AIMessage({ content: `Hello, ${state.name} 😎` }),

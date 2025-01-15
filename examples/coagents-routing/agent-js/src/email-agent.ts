@@ -6,14 +6,14 @@ import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { RunnableConfig } from "@langchain/core/runnables";
 import {
-  copilotKitCustomizeConfig,
-  copilotKitExit,
-} from "@copilotkit/sdk-js/langchain";
+  copilotkitCustomizeConfig,
+  CopilotKitStateAnnotation,
+  copilotkitExit,
+} from "@copilotkit/sdk-js/langgraph";
 import { SystemMessage, ToolMessage } from "@langchain/core/messages";
 import { getModel } from "./model";
 import { END, MemorySaver, StateGraph } from "@langchain/langgraph";
 import { Annotation } from "@langchain/langgraph";
-import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langchain";
 
 // Define the EmailAgentState annotation, extending MessagesState
 export const EmailAgentStateAnnotation = Annotation.Root({
@@ -40,7 +40,7 @@ export async function email_node(
    * Make a joke.
    */
 
-  config = copilotKitCustomizeConfig(config, {
+  config = copilotkitCustomizeConfig(config, {
     emitMessages: true,
     emitIntermediateState: [
       {
@@ -66,7 +66,7 @@ export async function email_node(
 
   const email = tool_calls?.[0]?.args.the_email;
 
-  await copilotKitExit(config);
+  await copilotkitExit(config);
 
   return {
     messages: [

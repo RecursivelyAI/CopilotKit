@@ -4,9 +4,9 @@
 
 import { RunnableConfig } from "@langchain/core/runnables";
 import {
-  copilotKitExit,
+  copilotkitExit,
   convertActionsToDynamicStructuredTools,
-} from "@copilotkit/sdk-js/langchain";
+} from "@copilotkit/sdk-js/langgraph";
 import { AIMessage, HumanMessage, ToolMessage } from "@langchain/core/messages";
 import { getModel } from "./model";
 import { END, MemorySaver, StateGraph } from "@langchain/langgraph";
@@ -49,7 +49,7 @@ export async function send_email_node(
    * Send an email.
    */
 
-  await copilotKitExit(config);
+  await copilotkitExit(config);
 
   const lastMessage = state.messages[state.messages.length - 1] as ToolMessage;
   const content =

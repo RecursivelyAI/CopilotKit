@@ -3,6 +3,7 @@ import { Comments } from "./comments";
 
 // @ts-ignore
 import fs from "fs";
+import { parsePythonDocstrings } from "./python";
 
 export interface ReferenceDocConfiguration {
   sourcePath: string;
@@ -11,14 +12,23 @@ export interface ReferenceDocConfiguration {
   component?: string;
   hook?: string;
   description?: string;
+  title?: string;
+  pythonSymbols?: string[];
+  typescriptSymbols?: string[];
 }
-// docs/pages/reference/classes/CopilotRuntime/service-adapters/GoogleGenerativeAIAdapter.mdx
+
 export class ReferenceDoc {
   constructor(private readonly referenceDoc: ReferenceDocConfiguration) {}
 
   async generate() {
-    const generatedDocumentation = await this.generatedDocs();
-    // console.log(generatedDocumentation);
+    let generatedDocumentation: string | null = null;
+    if (this.referenceDoc.pythonSymbols) {
+      generatedDocumentation = this.generatedDocsPythonSymbols();
+    } else if (this.referenceDoc.typescriptSymbols) {
+      generatedDocumentation = await this.generatedDocsTypeScriptSymbols();
+    } else {
+      generatedDocumentation = await this.generatedDocsTypeScript();
+    }
     if (generatedDocumentation) {
       const dest = "../" + this.referenceDoc.destinationPath;
       fs.writeFileSync(dest, generatedDocumentation);
@@ -26,7 +36,91 @@ export class ReferenceDoc {
     }
   }
 
-  async generatedDocs(): Promise<string | null> {
+  generateTitle(title: string, description: string, sourcePath: string): string {
+    let result = `---\n`;
+    result += `title: "${title}"\n`;
+    if (description) {
+      result += `description: "${description}"\n`;
+    }
+    result += `---\n\n`;
+
+    result += `{\n`;
+    result += ` /*\n`;
+    result += `  * ATTENTION! DO NOT MODIFY THIS FILE!\n`;
+    result += `  * This page is auto-generated. If you want to make any changes to this page, changes must be made at:\n`;
+    result += `  * CopilotKit/${sourcePath}\n`;
+    result += `  */\n`;
+    result += `}\n`;
+    return result;
+  }
+
+  generatedDocsPythonSymbols(): string | null {
+    const content = fs.readFileSync(this.referenceDoc.sourcePath, "utf8");
+    const parsed = parsePythonDocstrings(this.referenceDoc.pythonSymbols!, content);
+    let result = this.generateTitle(
+      this.referenceDoc.title || "",
+      this.referenceDoc.description || "",
+      this.referenceDoc.sourcePath,
+    );
+    for (const fn of this.referenceDoc.pythonSymbols!) {
+      if (fn in parsed) {
+        const fnDoc = parsed[fn];
+        result += `## ${fn}\n\n`;
+        result += `${fnDoc.description}\n\n`;
+        if (fnDoc.parameters) {
+          result += `### Parameters\n\n`;
+          for (const param of fnDoc.parameters) {
+            const required = !param.type.startsWith("Optional");
+            result += `<PropertyReference name="${param.name}" type="${param.type}" ${required ? "required" : ""}> \n`;
+            result += `${param.description}\n`;
+            result += `</PropertyReference>\n\n`;
+          }
+        }
+        if (fnDoc.returns) {
+          result += `### Returns\n\n`;
+          result += `<PropertyReference name="returns" type="${fnDoc.returns.type}">\n`;
+          result += `${fnDoc.returns.description}\n`;
+          result += `</PropertyReference>\n\n`;
+        }
+      }
+    }
+    return result;
+  }
+
+  async generatedDocsTypeScriptSymbols(): Promise<string | null> {
+    const source = new SourceFile(this.referenceDoc.sourcePath);
+    await source.parse();
+
+    let result = this.generateTitle(
+      this.referenceDoc.title || "",
+      this.referenceDoc.description || "",
+      this.referenceDoc.sourcePath,
+    );
+    for (const fn of this.referenceDoc.typescriptSymbols!) {
+      const args = source.getFunctionArguments(fn);
+      if (!args) {
+        console.warn(`${fn} not found in ${this.referenceDoc.sourcePath}`);
+        continue;
+      }
+      const comment = source.getFunctionComment(fn);
+
+      result += `## ${fn}\n\n`;
+      if (comment) {
+        result += `${comment}\n\n`;
+      }
+      if (args) {
+        result += `### Parameters\n\n`;
+        for (const arg of args) {
+          result += `<PropertyReference name="${arg.name}" type="${arg.type}" ${arg.required ? "required" : ""} ${arg.defaultValue ? `default="${arg.defaultValue}"` : ""}> \n`;
+          result += `${arg.description}\n`;
+          result += `</PropertyReference>\n\n`;
+        }
+      }
+    }
+    return result;
+  }
+
+  async generatedDocsTypeScript(): Promise<string | null> {
     const source = new SourceFile(this.referenceDoc.sourcePath);
     await source.parse();
 
@@ -38,12 +132,6 @@ export class ReferenceDoc {
       return null;
     }
 
-    const arg0Interface = await source.getArg0Interface(
-      this.referenceDoc.className || this.referenceDoc.component || this.referenceDoc.hook || "",
-    );
-
-    let result: string = "";
-
     // handle imports
     const slashes = this.referenceDoc.destinationPath.split("/").length;
     let importPathPrefix = "";
@@ -51,22 +139,17 @@ export class ReferenceDoc {
       importPathPrefix += "../";
     }
 
-    result += `---\n`;
-    result += `title: "${this.referenceDoc.className || this.referenceDoc.component || this.referenceDoc.hook}"\n`;
-    if (this.referenceDoc.description) {
-      result += `description: "${this.referenceDoc.description}"\n`;
-    }
-    result += `---\n\n`;
-
-    result += `{\n`;
-    result += ` /*\n`;
-    result += `  * ATTENTION! DO NOT MODIFY THIS FILE!\n`;
-    result += `  * This page is auto-generated. If you want to make any changes to this page, changes must be made at:\n`;
-    result += `  * CopilotKit/${this.referenceDoc.sourcePath}\n`;
-    result += `  */\n`;
-    result += `}\n`;
+    let result = this.generateTitle(
+      this.referenceDoc.className || this.referenceDoc.component || this.referenceDoc.hook || "",
+      this.referenceDoc.description || "",
+      this.referenceDoc.sourcePath,
+    );
 
     result += `${comment}\n\n`;
+
+    const arg0Interface = await source.getArg0Interface(
+      this.referenceDoc.className || this.referenceDoc.component || this.referenceDoc.hook || "",
+    );
 
     if (arg0Interface) {
       const hasProperties = arg0Interface.properties.length > 0;

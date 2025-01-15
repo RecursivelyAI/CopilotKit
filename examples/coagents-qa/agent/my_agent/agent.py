@@ -9,7 +9,7 @@ from langgraph.graph import MessagesState
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import HumanMessage, ToolMessage, AIMessage
-from copilotkit.langchain import (
+from copilotkit.langgraph import (
     copilotkit_exit,
     copilotkit_emit_message
 )

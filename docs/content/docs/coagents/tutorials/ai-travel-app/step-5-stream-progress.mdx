@@ -38,7 +38,7 @@ we'll be emitting.
 
 ```python title="agent/travel/search.py" {3-5}
 # ...
-from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config # [!code ++]
+from copilotkit.langgraph import copilotkit_emit_state, copilotkit_customize_config # [!code ++]
 
 async def search_node(state: AgentState, config: RunnableConfig):
     """

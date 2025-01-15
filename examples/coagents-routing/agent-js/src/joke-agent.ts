@@ -6,14 +6,13 @@ import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { RunnableConfig } from "@langchain/core/runnables";
 import {
-  copilotKitCustomizeConfig,
-  copilotKitExit,
-} from "@copilotkit/sdk-js/langchain";
+  copilotkitCustomizeConfig,
+  copilotkitExit,
+  CopilotKitStateAnnotation,
+} from "@copilotkit/sdk-js/langgraph";
 import { SystemMessage, ToolMessage } from "@langchain/core/messages";
 import { getModel } from "./model";
 import { END, MemorySaver, StateGraph, Annotation } from "@langchain/langgraph";
-
-import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langchain";
 
 // Define the JokeAgentState annotation, extending MessagesState
 export const JokeAgentStateAnnotation = Annotation.Root({
@@ -37,7 +36,7 @@ export async function joke_node(state: JokeAgentState, config: RunnableConfig) {
    * Make a joke.
    */
 
-  config = copilotKitCustomizeConfig(config, {
+  config = copilotkitCustomizeConfig(config, {
     emitMessages: true,
     emitIntermediateState: [
       {
@@ -63,7 +62,7 @@ export async function joke_node(state: JokeAgentState, config: RunnableConfig) {
 
   const joke = tool_calls?.[0]?.args.the_joke;
 
-  await copilotKitExit(config);
+  await copilotkitExit(config);
 
   return {
     messages: [

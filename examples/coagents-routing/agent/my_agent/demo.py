@@ -9,7 +9,7 @@ load_dotenv()
 from fastapi import FastAPI
 import uvicorn
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
-from copilotkit import CopilotKitSDK, Action, LangGraphAgent
+from copilotkit import CopilotKitRemoteEndpoint, Action, LangGraphAgent
 from my_agent.joke_agent import joke_graph
 from my_agent.email_agent import email_graph
 from my_agent.pirate_agent import pirate_graph
@@ -20,7 +20,7 @@ def greet_user(name):
     return "The user has been greeted. YOU MUST tell them to check the console."
 
 app = FastAPI()
-sdk = CopilotKitSDK(
+sdk = CopilotKitRemoteEndpoint(
     actions=[
         Action(
             name="greet_user",

@@ -26,7 +26,7 @@ A few key benefits:<br/>
 <Tabs items={['Python', 'TypeScript']} default="Python">
     <Tab value="Python">
         ```python
-        from copilotkit.langchain import copilotkit_emit_state
+        from copilotkit.langgraph import copilotkit_emit_state
 
         async def some_langgraph_node(state: AgentState, config: RunnableConfig):
             # ... whatever you want to docs
@@ -47,7 +47,7 @@ A few key benefits:<br/>
     </Tab>
     <Tab value="TypeScript">
         ```typescript
-        import { copilotKitEmitState } from '@copilotkit/sdk-js/langchain';
+        import { copilotkitEmitState } from '@copilotkit/sdk-js/langgraph';
 
         async function someLanggraphNode(state: AgentState, config: RunnableConfig): Promise<AgentState> {
             // ... whatever you want to docs
@@ -58,7 +58,7 @@ A few key benefits:<br/>
                 done: false
             });
 
-            await copilotKitEmitState(config, state); // manually emit the updated state // [!code highlight:1]
+            await copilotkitEmitState(config, state); // manually emit the updated state // [!code highlight:1]
 
             // ... keep running your graph
 
@@ -82,7 +82,7 @@ In this example, we're asking for the `outline` state-key to be streamed as it c
 <Tabs items={['Python', 'TypeScript']} default="Python">
     <Tab value="Python">
         ```python
-        from copilotkit.langchain import copilotkit_customize_config
+        from copilotkit.langgraph import copilotkit_customize_config
 
         async def streaming_state_node(state: AgentState, config: RunnableConfig):
             modifiedConfig = copilotkit_customize_config( # [!code highlight:15]
@@ -118,10 +118,10 @@ In this example, we're asking for the `outline` state-key to be streamed as it c
     </Tab>
     <Tab value="TypeScript">
         ```typescript
-        import { copilotKitCustomizeConfig } from '@copilotkit/sdk-js/langchain';
+        import { copilotkitCustomizeConfig } from '@copilotkit/sdk-js/langgraph';
 
         async function streamingStateNode(state: AgentState, config: RunnableConfig): Promise<AgentState> {
-            const modifiedConfig = copilotKitCustomizeConfig( // [!code highlight:15]
+            const modifiedConfig = copilotkitCustomizeConfig( // [!code highlight:15]
                 config,
 
                 // this will stream the `set_outline` tool-call's `outline` argument, *as if* it was the `outline` state parameter.

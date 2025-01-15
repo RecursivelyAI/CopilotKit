@@ -1,0 +1,137 @@
+---
+title: "Remote Endpoints"
+description: "CopilotKit Remote Endpoints allow you to connect actions and agents written in Python to your CopilotKit application."
+---
+
+{
+ /*
+  * ATTENTION! DO NOT MODIFY THIS FILE!
+  * This page is auto-generated. If you want to make any changes to this page, changes must be made at:
+  * CopilotKit/../sdk-python/copilotkit/sdk.py
+  */
+}
+## CopilotKitRemoteEndpoint
+
+CopilotKitRemoteEndpoint lets you connect actions and agents written in Python to your 
+    CopilotKit application.
+
+    To install CopilotKit for Python, run:
+
+    ```bash
+    pip install copilotkit
+    ```
+
+    ### Examples
+
+    For example, to provide a simple action to the Copilot:
+    ```python
+    from copilotkit import CopilotKitRemoteEndpoint, Action
+
+    sdk = CopilotKitRemoteEndpoint(
+        actions=[
+            Action(
+                name="greet_user",
+                handler=greet_user_handler,
+                description="Greet the user",
+                parameters=[
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "description": "The name of the user"
+                    }
+                ]
+            )
+        ]
+    )
+    ```
+
+    You can also dynamically build actions by providing a callable that returns a list of actions.
+    In this example, we use `"name"` from the `properties` object to parameterize the action handler.
+
+    ```python
+    from copilotkit import CopilotKitRemoteEndpoint, Action
+
+    sdk = CopilotKitRemoteEndpoint(
+        actions=lambda context: [
+            Action(
+                name="greet_user",
+                handler=make_greet_user_handler(context["properties"]["name"]), 
+                description="Greet the user"
+            )
+        ]
+    )
+    ```
+
+    Using the same approach, you can restrict the actions available to the Copilot:
+
+    ```python
+    from copilotkit import CopilotKitRemoteEndpoint, Action
+
+    sdk = CopilotKitRemoteEndpoint(
+        actions=lambda context: (
+            [action_a, action_b] if is_admin(context["properties"]["token"]) else [action_a]
+        )
+    )
+    ```
+
+    Similarly, you can give a list of static or dynamic agents to the Copilot:
+
+    ```python
+    from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
+    from my_agent.agent import graph
+
+    sdk = CopilotKitRemoteEndpoint(
+        agents=[
+        LangGraphAgent(
+                name="email_agent",
+                description="This agent sends emails",
+                graph=graph,
+            )
+        ]
+    )
+    ```
+
+    To serve the CopilotKit SDK, you can use the `add_fastapi_endpoint` function from the `copilotkit.integrations.fastapi` module:
+
+    ```python
+    from copilotkit.integrations.fastapi import add_fastapi_endpoint
+    from fastapi import FastAPI
+
+    app = FastAPI()
+    sdk = CopilotKitRemoteEndpoint(...)
+    add_fastapi_endpoint(app, sdk, "/copilotkit")
+
+    def main():
+        uvicorn.run(
+            "your_package:app",
+            host="0.0.0.0",
+            port=8000,
+            reload=True,
+        )
+
+    ```
+
+### Parameters
+
+<PropertyReference name="actions" type="Optional[Union[List[Action], Callable[[CopilotKitContext], List[Action]]]]" > 
+The actions to make available to the Copilot.
+</PropertyReference>
+
+<PropertyReference name="agents" type="Optional[Union[List[Agent], Callable[[CopilotKitContext], List[Agent]]]]" > 
+The agents to make available to the Copilot.
+</PropertyReference>
+
+## CopilotKitContext
+
+CopilotKit Context
+
+### Parameters
+
+<PropertyReference name="properties" type="Any" required> 
+The properties provided to the frontend via `<CopilotKit properties={...} />`
+</PropertyReference>
+
+<PropertyReference name="frontend_url" type="Optional[str]" > 
+The current URL of the frontend
+</PropertyReference>
+

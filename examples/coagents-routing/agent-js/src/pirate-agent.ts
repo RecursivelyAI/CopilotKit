@@ -4,11 +4,12 @@
 
 import { RunnableConfig } from "@langchain/core/runnables";
 import { SystemMessage } from "@langchain/core/messages";
-import { copilotKitExit } from "@copilotkit/sdk-js/langchain";
+import {
+  copilotkitExit,
+  CopilotKitStateAnnotation,
+} from "@copilotkit/sdk-js/langgraph";
 import { getModel } from "./model";
 import { END, MemorySaver, StateGraph, Annotation } from "@langchain/langgraph";
-
-import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langchain";
 
 // Define the PirateAgentState annotation, extending MessagesState
 export const PirateAgentStateAnnotation = Annotation.Root({
@@ -39,7 +40,7 @@ export async function pirate_node(
   );
 
   if (response.content === "Arrr, I'll be here if you need me!") {
-    await copilotKitExit(config);
+    await copilotkitExit(config);
   }
 
   return {

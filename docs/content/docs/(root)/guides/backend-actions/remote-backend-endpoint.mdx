@@ -116,7 +116,7 @@ Import the CopilotKit SDK and define your backend actions. For example:
 ```python title="/my_copilotkit_remote_endpoint/server.py"
 from fastapi import FastAPI
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
-from copilotkit import CopilotKitSDK, Action as CopilotAction
+from copilotkit import CopilotKitRemoteEndpoint, Action as CopilotAction
 
 app = FastAPI()
 
@@ -141,7 +141,7 @@ action = CopilotAction(
 )
 
 # Initialize the CopilotKit SDK # [!code highlight:2]
-sdk = CopilotKitSDK(actions=[action])
+sdk = CopilotKitRemoteEndpoint(actions=[action])
 
 # Add the CopilotKit endpoint to your FastAPI app # [!code highlight:2]
 add_fastapi_endpoint(app, sdk, "/copilotkit_remote")
@@ -274,7 +274,7 @@ def build_agents(context):
 
 
 app = FastAPI()
-sdk = CopilotKitSDK(
+sdk = CopilotKitRemoteEndpoint(
     agents=build_agents,
 )
 ```

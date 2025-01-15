@@ -30,7 +30,7 @@ If you have already done that, you can check the following:
         only streamed messages are emitted. You can fix this by adding the following to the node making the tool call.
 
         ```python
-        from copilotkit.langchain import copilotkit_customize_config, copilotkit_emit_message
+        from copilotkit.langgraph import copilotkit_customize_config, copilotkit_emit_message
         from langgraph_core.runnables import RunnableConfig
         from langchain.tools import tool
 

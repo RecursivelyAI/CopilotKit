@@ -121,4 +121,48 @@ export const REFERENCE_DOCS: ReferenceDocConfiguration[] = [
     description:
       "The useCoAgent hook allows you to share state bidirectionally between your application and the agent.",
   },
+  /* SDKs */
+  {
+    sourcePath: "../sdk-python/copilotkit/langgraph.py",
+    destinationPath: "docs/content/docs/reference/sdk/python/LangGraph.mdx",
+    title: "LangGraph SDK",
+    description:
+      "The CopilotKit LangGraph SDK for Python allows you to build and run LangGraph workflows with CopilotKit.",
+    pythonSymbols: [
+      "copilotkit_customize_config",
+      "copilotkit_exit",
+      "copilotkit_emit_state",
+      "copilotkit_emit_message",
+      "copilotkit_emit_tool_call",
+    ],
+  },
+  {
+    sourcePath: "../sdk-python/copilotkit/langgraph_agent.py",
+    destinationPath: "docs/content/docs/reference/sdk/python/LangGraphAgent.mdx",
+    title: "LangGraphAgent",
+    description: "LangGraphAgent lets you define your agent for use with CopilotKit.",
+    pythonSymbols: ["LangGraphAgent", "CopilotKitConfig"],
+  },
+  {
+    sourcePath: "../sdk-python/copilotkit/sdk.py",
+    destinationPath: "docs/content/docs/reference/sdk/python/RemoteEndpoints.mdx",
+    title: "Remote Endpoints",
+    description:
+      "CopilotKit Remote Endpoints allow you to connect actions and agents written in Python to your CopilotKit application.",
+    pythonSymbols: ["CopilotKitRemoteEndpoint", "CopilotKitContext"],
+  },
+  {
+    sourcePath: "packages/sdk-js/src/langgraph.ts",
+    destinationPath: "docs/content/docs/reference/sdk/js/LangGraph.mdx",
+    title: "LangGraph SDK",
+    description:
+      "The CopilotKit LangGraph SDK for JavaScript allows you to build and run LangGraph workflows with CopilotKit.",
+    typescriptSymbols: [
+      "copilotkitCustomizeConfig",
+      "copilotkitExit",
+      "copilotkitEmitState",
+      "copilotkitEmitMessage",
+      "copilotkitEmitToolCall",
+    ],
+  },
 ];

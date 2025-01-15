@@ -21,6 +21,10 @@
     "./langchain": {
       "require": "./dist/langchain.js",
       "import": "./dist/langchain.mjs"
+    },
+    "./langgraph": {
+      "require": "./dist/langgraph.js",
+      "import": "./dist/langgraph.mjs"
     }
   },
   "types": "./dist/index.d.ts",
@@ -28,6 +32,9 @@
     "*": {
       "langchain": [
         "dist/langchain.d.ts"
+      ],
+      "langgraph": [
+        "dist/langgraph.d.ts"
       ],
       "*": [
         "dist/*"

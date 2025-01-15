@@ -7,7 +7,7 @@ from langgraph.graph import MessagesState, START
 # Here we define any ACTUAL tools
 from langchain_core.tools import tool
 from langgraph.prebuilt import ToolNode
-from copilotkit.langchain import copilotkit_customize_config
+from copilotkit.langgraph import copilotkit_customize_config
 
 
 @tool

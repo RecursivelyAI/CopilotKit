@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import List, Any, cast
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
-from ..sdk import CopilotKitSDK, CopilotKitSDKContext
+from ..sdk import CopilotKitRemoteEndpoint, CopilotKitContext
 from ..types import Message
 from ..exc import (
     ActionNotFoundException,
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def add_fastapi_endpoint(
         fastapi_app: FastAPI,
-        sdk: CopilotKitSDK,
+        sdk: CopilotKitRemoteEndpoint,
         prefix: str,
         *,
         max_workers: int = 10,
@@ -30,7 +30,7 @@ def add_fastapi_endpoint(
     """Add FastAPI endpoint with configurable ThreadPoolExecutor size"""
     executor = ThreadPoolExecutor(max_workers=max_workers)
 
-    def run_handler_in_thread(request: Request, sdk: CopilotKitSDK):
+    def run_handler_in_thread(request: Request, sdk: CopilotKitRemoteEndpoint):
         # Run the handler coroutine in the event loop        
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -58,7 +58,7 @@ def body_get_or_raise(body: Any, key: str):
     return value
 
 
-async def handler(request: Request, sdk: CopilotKitSDK):
+async def handler(request: Request, sdk: CopilotKitRemoteEndpoint):
     """Handle FastAPI request"""
 
     try:
@@ -69,7 +69,7 @@ async def handler(request: Request, sdk: CopilotKitSDK):
     path = request.path_params.get('path')
     method = request.method
     context = cast(
-        CopilotKitSDKContext, 
+        CopilotKitContext, 
         {
             "properties": body.get("properties", {}),
             "frontend_url": body.get("frontendUrl", None)
@@ -114,15 +114,15 @@ async def handler(request: Request, sdk: CopilotKitSDK):
     raise HTTPException(status_code=404, detail="Not found")
 
 
-async def handle_info(*, sdk: CopilotKitSDK, context: CopilotKitSDKContext):
+async def handle_info(*, sdk: CopilotKitRemoteEndpoint, context: CopilotKitContext):
     """Handle info request with FastAPI"""
     result = sdk.info(context=context)
     return JSONResponse(content=result)
 
 async def handle_execute_action(
         *,
-        sdk: CopilotKitSDK,
-        context: CopilotKitSDKContext,
+        sdk: CopilotKitRemoteEndpoint,
+        context: CopilotKitContext,
         name: str,
         arguments: dict,
     ):
@@ -146,8 +146,8 @@ async def handle_execute_action(
 
 def handle_execute_agent( # pylint: disable=too-many-arguments
         *,
-        sdk: CopilotKitSDK,
-        context: CopilotKitSDKContext,
+        sdk: CopilotKitRemoteEndpoint,
+        context: CopilotKitContext,
         thread_id: str,
         node_name: str,
         name: str,

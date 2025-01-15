@@ -145,14 +145,14 @@ In order for CopilotKit to integrate with your LangGraph agent, the agent has to
 
         The next step is to configure the Remote Endpoint to serve LangGraph agents.
 
-        First, find your `CopilotKitSDK` instance in your Python Remote Endpoint (typically `server.py`). <br/>
-        **Then modify your `CopilotKitSDK` instance (setup in the previous step) to serve LangGraph agents:**
+        First, find your `CopilotKitRemoteEndpoint` instance in your Python Remote Endpoint (typically `server.py`). <br/>
+        **Then modify your `CopilotKitRemoteEndpoint` instance (setup in the previous step) to serve LangGraph agents:**
 
         ```python title="server.py"
-        from copilotkit import CopilotKitSDK, LangGraphAgent # [!code highlight]
+        from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent # [!code highlight]
         from .agent import the_langraph_graph # Import your LangGraph agent; in this example, it's the variable named `the_langraph_graph` in ./agent.py # [!code highlight]
         from copilotkit.integrations.fastapi import add_fastapi_endpoint
-        from copilotkit.langchain import copilotkit_messages_to_langchain # you only need this if you use Google Gemini in your LangGraph agent.
+        from copilotkit.langgraph import copilotkit_messages_to_langchain # you only need this if you use Google Gemini in your LangGraph agent.
         # ... other imports
 
         app = FastAPI()
@@ -160,7 +160,7 @@ In order for CopilotKit to integrate with your LangGraph agent, the agent has to
         # ...
 
         # Initialize the CopilotKit SDK
-        sdk = CopilotKitSDK(
+        sdk = CopilotKitRemoteEndpoint(
           agents=[ # [!code highlight:10]
             LangGraphAgent(
               name="basic_agent",

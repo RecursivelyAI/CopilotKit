@@ -12,7 +12,7 @@ from langchain_core.runnables import RunnableConfig, ensure_config
 from partialjson.json_parser import JSONParser
 
 from .types import Message
-from .langchain import copilotkit_messages_to_langchain, langchain_messages_to_copilotkit
+from .langgraph import copilotkit_messages_to_langchain, langchain_messages_to_copilotkit
 from .action import ActionDict
 from .agent import Agent
 from .logging import get_logger
@@ -20,7 +20,34 @@ from .logging import get_logger
 logger = get_logger(__name__)
 
 class CopilotKitConfig(TypedDict):
-    """CopilotKit config"""
+    """
+    CopilotKit config for LangGraphAgent
+
+    This is used for advanced cases where you want to customize how CopilotKit interacts with
+    LangGraph.
+
+    ```python
+    # Function signatures:
+    def merge_state(
+        *,
+        state: dict,
+        messages: List[BaseMessage],
+        actions: List[Any],
+        agent_name: str
+    ):
+        # ...implementation...
+
+    def convert_messages(messages: List[Message]):
+        # ...implementation...
+    ```
+
+    Parameters
+    ----------
+    merge_state : Callable
+        This function lets you customize how CopilotKit merges the agent state.
+    convert_messages : Callable
+        Use this function to customize how CopilotKit converts its messages to LangChain messages.`
+    """
     merge_state: NotRequired[Callable]
     convert_messages: NotRequired[Callable]
 
@@ -49,13 +76,60 @@ def langgraph_default_merge_state( # pylint: disable=unused-argument
     }
 
 class LangGraphAgent(Agent):
-    """LangGraph agent class for CopilotKit"""
+    """
+    LangGraphAgent lets you define your agent for use with CopilotKit.
+
+    To install, run:
+
+    ```bash
+    pip install copilotkit
+    ```
+
+    ### Examples
+
+    Every agent must have the `name` and `graph` properties defined. An optional `description` 
+    can also be provided. This is used when CopilotKit is dynamically routing requests to the 
+    agent.
+
+    ```python
+    from copilotkit import LangGraphAgent
+
+    LangGraphAgent(
+        name="email_agent",
+        description="This agent sends emails",
+        graph=graph,
+    )
+    ```
+
+    If you have a custom LangGraph/LangChain config that you want to use with the agent, you can 
+    pass it in as the `langgraph_config` parameter.
+
+    ```python
+    LangGraphAgent(
+        ...
+        langgraph_config=config,
+    )
+    ```
+
+    Parameters
+    ----------
+    name : str
+        The name of the agent.
+    graph : CompiledGraph
+        The LangGraph graph to use with the agent.
+    description : Optional[str]
+        The description of the agent.
+    langgraph_config : Optional[RunnableConfig]
+        The LangGraph/LangChain config to use with the agent. 
+    copilotkit_config : Optional[CopilotKitConfig]
+        The CopilotKit config to use with the agent.
+    """
     def __init__(
             self,
             *,
             name: str,
+            graph: CompiledGraph = None,
             description: Optional[str] = None,
-            graph: Optional[CompiledGraph] = None,
             langgraph_config:  Union[Optional[RunnableConfig], dict] = None,
             copilotkit_config: Optional[CopilotKitConfig] = None,
 

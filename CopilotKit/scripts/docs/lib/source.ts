@@ -297,4 +297,62 @@ export class SourceFile {
 
     return constructorDefinition;
   }
+
+  /**
+   * Get the block comment preceding a function definition.
+   */
+  getFunctionComment(functionName: string): string | null {
+    let functionComment: string | null = null;
+
+    const visit = (node: ts.Node) => {
+      if (ts.isFunctionDeclaration(node) && node.name?.getText() === functionName) {
+        functionComment = Comments.getCleanedCommentsForNode(node, this.sourceFile);
+      }
+      ts.forEachChild(node, visit);
+    };
+
+    visit(this.sourceFile);
+
+    return functionComment;
+  }
+
+  /**
+   * Get the arguments of a function by its name.
+   */
+  getFunctionArguments(functionName: string): Array<{
+    name: string;
+    type: string;
+    required: boolean;
+    defaultValue: string;
+    description: string;
+  }> | null {
+    let functionArguments: Array<{
+      name: string;
+      type: string;
+      required: boolean;
+      defaultValue: string;
+      description: string;
+    }> | null = null;
+
+    const visit = (node: ts.Node) => {
+      if (ts.isFunctionDeclaration(node) && node.name?.getText() === functionName) {
+        functionArguments = node.parameters.map((param) => {
+          const name = param.name.getText();
+          const type = param.type?.getText() || "unknown";
+          const required = !param.questionToken;
+          const defaultValue = param.initializer ? param.initializer.getText() : "";
+
+          // Use the comment cleaning method
+          const description = Comments.getCleanedCommentsForNode(param, this.sourceFile);
+
+          return { name, type, required, defaultValue, description };
+        });
+      }
+      ts.forEachChild(node, visit);
+    };
+
+    visit(this.sourceFile);
+
+    return functionArguments;
+  }
 }

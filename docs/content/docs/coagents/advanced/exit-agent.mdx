@@ -26,7 +26,7 @@ In this example from [our email-sending app](https://github.com/copilotkit/copil
         <Tabs items={['Python', 'TypeScript']} default="Python">
             <Tab value="Python">
                 ```python
-                from copilotkit.langchain import (copilotkit_exit)
+                from copilotkit.langgraph import (copilotkit_exit)
                 # ...
                 async def send_email_node(state: EmailAgentState, config: RunnableConfig):
                     """Send an email."""
@@ -47,14 +47,14 @@ In this example from [our email-sending app](https://github.com/copilotkit/copil
             </Tab>
             <Tab value="TypeScript">
                 ```typescript
-                import { copilotKitEmitMessage } from "@copilotkit/sdk-js/langchain";
+                import { copilotkitExit } from "@copilotkit/sdk-js/langgraph";
 
                 // ...
 
                 async function sendEmailNode(state: EmailAgentState, config: RunnableConfig): Promise<{ messages: any[] }> {
                     // Send an email.
 
-                    await copilotKitExit(config); // [!code highlight]
+                    await copilotkitExit(config); // [!code highlight]
 
                     // get the last message and cast to ToolMessage
                     const lastMessage = state.messages[state.messages.length - 1] as ToolMessage;

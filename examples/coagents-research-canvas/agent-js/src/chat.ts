@@ -13,7 +13,7 @@ import {
 } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { copilotKitCustomizeConfig } from "@copilotkit/sdk-js/langchain";
+import { copilotkitCustomizeConfig } from "@copilotkit/sdk-js/langgraph";
 
 const Search = tool(() => {}, {
   name: "Search",
@@ -41,7 +41,7 @@ const DeleteResources = tool(() => {}, {
 });
 
 export async function chat_node(state: AgentState, config: RunnableConfig) {
-  const customConfig = copilotKitCustomizeConfig(config, {
+  const customConfig = copilotkitCustomizeConfig(config, {
     emitIntermediateState: [
       {
         stateKey: "report",

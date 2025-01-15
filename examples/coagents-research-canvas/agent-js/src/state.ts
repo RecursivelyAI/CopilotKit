@@ -1,5 +1,5 @@
 import { Annotation } from "@langchain/langgraph";
-import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langchain";
+import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 
 // Define a Resource annotation with properties for URL, title, and description
 const ResourceAnnotation = Annotation.Root({

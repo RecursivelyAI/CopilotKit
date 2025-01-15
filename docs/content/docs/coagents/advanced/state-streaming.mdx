@@ -42,7 +42,7 @@ One great use case for state streaming is to present LLM messages to the user, g
 <Tabs items={['Python', 'TypeScript']} default="Python">
     <Tab value="Python">
         ```python
-        from copilotkit.langchain import copilotkit_customize_config
+        from copilotkit.langgraph import copilotkit_customize_config
 
         async def talk_to_user_node(state: AgentState, config: RunnableConfig):
             """
@@ -67,7 +67,7 @@ One great use case for state streaming is to present LLM messages to the user, g
     </Tab>
     <Tab value="TypeScript">
         ```typescript
-        import { copilotKitCustomizeConfig } from '@copilotkit/sdk-js/langchain';
+        import { copilotkitCustomizeConfig } from '@copilotkit/sdk-js/langgraph';
 
         async function talkToUserNode(state: AgentState, config: RunnableConfig): Promise<AgentState> {
             /**
@@ -105,7 +105,7 @@ With `emit_intermediate_state`, you can have CopilotKit set a key in your state 
 <Tabs items={['Python', 'TypeScript']} default="Python">
     <Tab value="Python">
         ```python
-        from copilotkit.langchain import copilotkit_customize_config
+        from copilotkit.langgraph import copilotkit_customize_config
 
         async def streaming_state_node(state: AgentState, config: RunnableConfig):
             modifiedConfig = copilotkit_customize_config(
@@ -137,10 +137,10 @@ With `emit_intermediate_state`, you can have CopilotKit set a key in your state 
     </Tab>
     <Tab value="TypeScript">
         ```typescript
-        import { copilotKitCustomizeConfig } from '@copilotkit/sdk-js/langchain';
+        import { copilotkitCustomizeConfig } from '@copilotkit/sdk-js/langgraph';
 
         async function streamingStateNode(state: AgentState, config: RunnableConfig): Promise<AgentState> {
-            const modifiedConfig = copilotKitCustomizeConfig(
+            const modifiedConfig = copilotkitCustomizeConfig(
                 config,
 
                 // this will stream tool calls *as if* they were state
@@ -206,7 +206,7 @@ Here's a complete example:
         ```typescript
 
         import { Annotation } from "@langchain/langgraph";
-        import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langchain";
+        import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 
         export const AgentStateAnnotation = Annotation.Root({
             // add any additional properties here
@@ -243,7 +243,7 @@ You can pass `emit_messages=False` in these cases, which will suppress any messa
 <Tabs items={['Python', 'TypeScript']} default="Python">
     <Tab value="Python">
         ```python
-        from copilotkit.langchain import copilotkit_customize_config
+        from copilotkit.langgraph import copilotkit_customize_config
 
         def frontend_actions_node(state: AgentState, config: RunnableConfig):
             
@@ -265,11 +265,11 @@ You can pass `emit_messages=False` in these cases, which will suppress any messa
     </Tab>
     <Tab value="TypeScript">
         ```typescript
-        import { copilotKitCustomizeConfig } from '@copilotkit/sdk-js/langchain';
+        import { copilotkitCustomizeConfig } from '@copilotkit/sdk-js/langgraph';
 
         async function frontendActionsNode(state: AgentState, config: RunnableConfig): Promise<AgentState> {
             // 1) Configure CopilotKit not to emit messages
-            const modifiedConfig = copilotKitCustomizeConfig(
+            const modifiedConfig = copilotkitCustomizeConfig(
                 config,
                 { emitMessages: false }
             );

@@ -3,7 +3,7 @@ from langchain_core.messages import ToolMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 from travel.state import AgentState, Trip, Place
-from copilotkit.langchain import copilotkit_emit_message
+from copilotkit.langgraph import copilotkit_emit_message
 
 
 

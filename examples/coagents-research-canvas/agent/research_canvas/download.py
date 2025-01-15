@@ -4,7 +4,7 @@ This module contains the implementation of the download_node function.
 
 import aiohttp
 import html2text
-from copilotkit.langchain import copilotkit_emit_state
+from copilotkit.langgraph import copilotkit_emit_state
 from langchain_core.runnables import RunnableConfig
 from research_canvas.state import AgentState
 

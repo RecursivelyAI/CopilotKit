@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
         graph = workflow.compile(checkpointer=checkpointer)
 
         # Create SDK with the graph
-        sdk = CopilotKitSDK(
+        sdk = CopilotKitRemoteEndpoint(
             agents=[
                 LangGraphAgent(
                     name="research_agent",
