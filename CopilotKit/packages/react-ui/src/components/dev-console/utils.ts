@@ -50,7 +50,7 @@ export async function getPublishedCopilotKitVersion(
   }
 
   try {
-    const response = await fetch("https://api.cloud.stagingcopilotkit.ai/check-for-updates", {
+    const response = await fetch("https://api.cloud.copilotkit.ai/check-for-updates", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
