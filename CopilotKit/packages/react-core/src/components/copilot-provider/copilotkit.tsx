@@ -42,7 +42,7 @@ import { ToastProvider } from "../toast/toast-provider";
 import { useCopilotRuntimeClient } from "../../hooks/use-copilot-runtime-client";
 import { shouldShowDevConsole } from "../../utils";
 import { CopilotErrorBoundary } from "../error-boundary/error-boundary";
-import { Agent } from "@copilotkit/runtime-client-gql";
+import { Agent, ExtensionsInput } from "@copilotkit/runtime-client-gql";
 
 export function CopilotKit({ children, ...props }: CopilotKitProps) {
   const showDevConsole = props.showDevConsole === undefined ? "auto" : props.showDevConsole;
@@ -80,6 +80,7 @@ export function CopilotKitInternal({ children, ...props }: CopilotKitProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [chatInstructions, setChatInstructions] = useState("");
   const [authStates, setAuthStates] = useState<Record<string, AuthState>>({});
+  const [extensions, setExtensions] = useState<ExtensionsInput>({});
 
   const {
     addElement: addDocument,
@@ -365,6 +366,8 @@ export function CopilotKitInternal({ children, ...props }: CopilotKitProps) {
         authConfig: props.authConfig,
         authStates,
         setAuthStates,
+        extensions,
+        setExtensions,
       }}
     >
       <CopilotMessages>{children}</CopilotMessages>

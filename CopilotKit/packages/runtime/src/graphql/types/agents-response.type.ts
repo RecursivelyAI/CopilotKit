@@ -1,7 +1,4 @@
-import { Field, InterfaceType, ObjectType } from "type-graphql";
-import { MessageRole } from "./enums";
-import { MessageStatusUnion } from "./message-status.type";
-import { ResponseStatusUnion } from "./response-status.type";
+import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
 export class Agent {

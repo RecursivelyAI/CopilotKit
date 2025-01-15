@@ -19,6 +19,8 @@ import {
   CopilotRequestType,
   ForwardedParametersInput,
   loadMessagesFromJsonRepresentation,
+  ExtensionsInput,
+  CopilotRuntimeClient,
 } from "@copilotkit/runtime-client-gql";
 
 import { CopilotApiConfig } from "../context";
@@ -128,6 +130,14 @@ export type UseChatOptions = {
    * The agent lock.
    */
   agentLock: string | null;
+  /**
+   * The extensions.
+   */
+  extensions: ExtensionsInput;
+  /**
+   * The setState-powered method to update the extensions.
+   */
+  setExtensions: React.Dispatch<React.SetStateAction<ExtensionsInput>>;
 };
 
 export type UseChatHelpers = {
@@ -183,6 +193,8 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
     setRunId,
     chatAbortControllerRef,
     agentLock,
+    extensions,
+    setExtensions,
   } = options;
   const runChatCompletionRef = useRef<(previousMessages: Message[]) => Promise<Message[]>>();
   // We need to keep a ref of coagent states and session because of renderAndWait - making sure
@@ -194,6 +206,8 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
   threadIdRef.current = threadId;
   const runIdRef = useRef<string | null>(runId);
   runIdRef.current = runId;
+  const extensionsRef = useRef<ExtensionsInput>(extensions);
+  extensionsRef.current = extensions;
 
   const publicApiKey = copilotConfig.publicApiKey;
 
@@ -241,6 +255,7 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
             },
             threadId: threadIdRef.current,
             runId: runIdRef.current,
+            extensions: extensionsRef.current,
             messages: convertMessagesToGqlInput(filterAgentStateMessages(messagesWithContext)),
             ...(copilotConfig.cloud
               ? {
@@ -316,8 +331,15 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
           threadIdRef.current = value.generateCopilotResponse.threadId || null;
           runIdRef.current = value.generateCopilotResponse.runId || null;
 
+          // in the output, graphql inserts __typename, which leads to an error when sending it along
+          // as input to the next request.
+          extensionsRef.current = CopilotRuntimeClient.removeGraphQLTypename(
+            value.generateCopilotResponse.extensions || {},
+          );
+
           setThreadId(threadIdRef.current);
           setRunId(runIdRef.current);
+          setExtensions(extensionsRef.current);
 
           messages = convertGqlOutputToMessages(
             filterAdjacentAgentStateMessages(value.generateCopilotResponse.messages),

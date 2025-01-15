@@ -192,6 +192,7 @@ export class CopilotResolver {
       runId,
       serverSideActions,
       actionInputsWithoutAgents,
+      extensions,
     } = await copilotRuntime.processRuntimeRequest({
       serviceAdapter,
       messages: data.messages,
@@ -207,6 +208,7 @@ export class CopilotResolver {
       agentSession: data.agentSession,
       agentStates: data.agentStates,
       url: data.frontend.url,
+      extensions: data.extensions,
     });
 
     logger.debug("Event source created, creating response");
@@ -215,6 +217,7 @@ export class CopilotResolver {
       threadId,
       runId,
       status: firstValueFrom(responseStatus$),
+      extensions,
       messages: new Repeater(async (pushMessage, stopStreamingMessages) => {
         logger.debug("Messages repeater created");
 

@@ -36,6 +36,8 @@ import { AgentStateInput } from "../../graphql/inputs/agent-state.input";
 import { ActionInputAvailability } from "../../graphql/types/enums";
 import { createHeaders } from "./remote-action-constructors";
 import { Agent } from "../../graphql/types/agents-response.type";
+import { ExtensionsInput } from "../../graphql/inputs/extensions.input";
+import { ExtensionsResponse } from "../../graphql/types/extensions-response.type";
 
 interface CopilotRuntimeRequest {
   serviceAdapter: CopilotServiceAdapter;
@@ -50,6 +52,7 @@ interface CopilotRuntimeRequest {
   graphqlContext: GraphQLContext;
   forwardedParameters?: ForwardedParametersInput;
   url?: string;
+  extensions?: ExtensionsInput;
 }
 
 interface CopilotRuntimeResponse {
@@ -58,6 +61,7 @@ interface CopilotRuntimeResponse {
   eventSource: RuntimeEventSource;
   serverSideActions: Action<any>[];
   actionInputsWithoutAgents: ActionInput[];
+  extensions?: ExtensionsResponse;
 }
 
 type ActionsConfiguration<T extends Parameter[] | [] = []> =
@@ -176,6 +180,7 @@ export class CopilotRuntime<const T extends Parameter[] | [] = []> {
       forwardedParameters,
       agentSession,
       url,
+      extensions,
     } = request;
 
     const eventSource = new RuntimeEventSource();
@@ -219,6 +224,7 @@ export class CopilotRuntime<const T extends Parameter[] | [] = []> {
         runId,
         eventSource,
         forwardedParameters,
+        extensions,
       });
 
       outputMessagesPromise
@@ -247,6 +253,7 @@ export class CopilotRuntime<const T extends Parameter[] | [] = []> {
           //   serverSideActions.find((serverSideAction) => serverSideAction.name == action.name),
           // ),
         ),
+        extensions: result.extensions,
       };
     } catch (error) {
       console.error("Error getting response:", error);

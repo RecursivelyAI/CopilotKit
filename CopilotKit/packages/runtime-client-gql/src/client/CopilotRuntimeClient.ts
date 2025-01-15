@@ -123,4 +123,18 @@ export class CopilotRuntimeClient {
     const fetchFn = createFetchFn();
     return this.client.query<AvailableAgentsQuery>(getAvailableAgentsQuery, {}, { fetch: fetchFn });
   }
+
+  static removeGraphQLTypename(data: any) {
+    if (Array.isArray(data)) {
+      data.forEach((item) => CopilotRuntimeClient.removeGraphQLTypename(item));
+    } else if (typeof data === "object" && data !== null) {
+      delete data.__typename;
+      Object.keys(data).forEach((key) => {
+        if (typeof data[key] === "object" && data[key] !== null) {
+          CopilotRuntimeClient.removeGraphQLTypename(data[key]);
+        }
+      });
+    }
+    return data;
+  }
 }

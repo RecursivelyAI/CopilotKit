@@ -10,7 +10,11 @@ import { DocumentPointer } from "../types";
 import { CopilotChatSuggestionConfiguration } from "../types/chat-suggestion-configuration";
 import { CoAgentStateRender, CoAgentStateRenderProps } from "../types/coagent-action";
 import { CoagentState } from "../types/coagent-state";
-import { CopilotRuntimeClient, ForwardedParametersInput } from "@copilotkit/runtime-client-gql";
+import {
+  CopilotRuntimeClient,
+  ExtensionsInput,
+  ForwardedParametersInput,
+} from "@copilotkit/runtime-client-gql";
 import { Agent } from "@copilotkit/runtime-client-gql";
 
 /**
@@ -193,6 +197,9 @@ export interface CopilotContextParams {
       onSignInComplete: (authState: AuthState) => void;
     }>;
   };
+
+  extensions: ExtensionsInput;
+  setExtensions: React.Dispatch<React.SetStateAction<ExtensionsInput>>;
 }
 
 const emptyCopilotContext: CopilotContextParams = {
@@ -254,6 +261,8 @@ const emptyCopilotContext: CopilotContextParams = {
   setRunId: () => {},
   chatAbortControllerRef: { current: null },
   availableAgents: [],
+  extensions: {},
+  setExtensions: () => {},
 };
 
 export const CopilotContext = React.createContext<CopilotContextParams>(emptyCopilotContext);

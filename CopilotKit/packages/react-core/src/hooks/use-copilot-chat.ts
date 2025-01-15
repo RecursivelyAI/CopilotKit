@@ -110,6 +110,8 @@ export function useCopilotChat({
     runId,
     setRunId,
     chatAbortControllerRef,
+    extensions,
+    setExtensions,
   } = useCopilotContext();
   const { messages, setMessages } = useCopilotMessagesContext();
 
@@ -175,6 +177,8 @@ export function useCopilotChat({
     setRunId,
     chatAbortControllerRef,
     agentLock,
+    extensions,
+    setExtensions,
   });
 
   // this is a workaround born out of a bug that Athena incessantly ran into.

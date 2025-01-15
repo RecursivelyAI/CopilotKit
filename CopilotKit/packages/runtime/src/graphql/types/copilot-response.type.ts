@@ -2,6 +2,7 @@ import { Field, InterfaceType, ObjectType } from "type-graphql";
 import { MessageRole } from "./enums";
 import { MessageStatusUnion } from "./message-status.type";
 import { ResponseStatusUnion } from "./response-status.type";
+import { ExtensionsResponse } from "./extensions-response.type";
 
 @InterfaceType({
   resolveType(value) {
@@ -110,4 +111,7 @@ export class CopilotResponse {
 
   @Field(() => [BaseMessageOutput])
   messages: (typeof BaseMessageOutput)[];
+
+  @Field(() => ExtensionsResponse, { nullable: true })
+  extensions?: ExtensionsResponse;
 }
