@@ -1,4 +1,5 @@
 import { graphql } from "../@generated/gql";
+import { LangGraphInterruptEvent } from "@copilotkit/runtime/src/graphql/types/meta-events.type";
 
 export const generateCopilotResponseMutation = graphql(/** GraphQL **/ `
   mutation generateCopilotResponse($data: GenerateCopilotResponseInput!, $properties: JSONObject) {
@@ -66,6 +67,13 @@ export const generateCopilotResponseMutation = graphql(/** GraphQL **/ `
           runId
           active
           role
+        }
+      }
+      metaEvents @stream {
+        ... on LangGraphInterruptEvent {
+          type
+          name
+          value
         }
       }
     }

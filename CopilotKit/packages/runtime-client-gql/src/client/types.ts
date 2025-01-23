@@ -8,6 +8,8 @@ import {
   BaseMessageOutput,
   AgentStateMessageInput,
   MessageStatusCode,
+  LangGraphInterruptEvent,
+  MetaEventName,
 } from "../graphql/@generated/graphql";
 
 type MessageType = "TextMessage" | "ActionExecutionMessage" | "ResultMessage" | "AgentStateMessage";
@@ -125,3 +127,11 @@ export class AgentStateMessage extends Message implements Omit<AgentStateMessage
     this.type = "AgentStateMessage";
   }
 }
+
+export function langGraphInterruptEvent(
+  eventProps: Omit<LangGraphInterruptEvent, "name" | "type" | "__typename">,
+): LangGraphInterruptEvent {
+  return { ...eventProps, name: MetaEventName.LangGraphInterruptEvent, type: "MetaEvent" };
+}
+
+export type MetaEvent = LangGraphInterruptEvent;

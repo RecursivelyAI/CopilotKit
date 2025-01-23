@@ -38,3 +38,8 @@ class IntermediateStateConfig(TypedDict):
     state_key: str
     tool: str
     tool_argument: NotRequired[str]
+
+class MetaEvent(TypedDict):
+    """Type definition for meta events"""
+    name: str
+    response: NotRequired[str]

@@ -45,6 +45,10 @@ import { useCopilotRuntimeClient } from "../../hooks/use-copilot-runtime-client"
 import { shouldShowDevConsole } from "../../utils";
 import { CopilotErrorBoundary } from "../error-boundary/error-boundary";
 import { Agent, ExtensionsInput } from "@copilotkit/runtime-client-gql";
+import {
+  LangGraphInterruptAction,
+  LangGraphInterruptActionSetterArgs,
+} from "../../types/interrupt-action";
 
 export function CopilotKit({ children, ...props }: CopilotKitProps) {
   const showDevConsole = props.showDevConsole === undefined ? "auto" : props.showDevConsole;
@@ -337,6 +341,24 @@ export function CopilotKitInternal(cpkProps: CopilotKitProps) {
 
   const showDevConsole = props.showDevConsole === undefined ? "auto" : props.showDevConsole;
 
+  const [langGraphInterruptAction, _setLangGraphInterruptAction] =
+    useState<LangGraphInterruptAction | null>(null);
+  const setLangGraphInterruptAction = useCallback((action: LangGraphInterruptActionSetterArgs) => {
+    _setLangGraphInterruptAction((prev) => {
+      if (prev == null) return action as LangGraphInterruptAction;
+      if (action == null) return null;
+      let event = prev.event;
+      if (action.event) {
+        // @ts-ignore
+        event = { ...prev.event, ...action.event };
+      }
+      return { ...prev, ...action, event };
+    });
+  }, []);
+  const removeLangGraphInterruptAction = useCallback((): void => {
+    setLangGraphInterruptAction(null);
+  }, []);
+
   return (
     <CopilotContext.Provider
       value={{
@@ -383,6 +405,9 @@ export function CopilotKitInternal(cpkProps: CopilotKitProps) {
         setAuthStates_c: setAuthStates,
         extensions,
         setExtensions,
+        langGraphInterruptAction,
+        setLangGraphInterruptAction,
+        removeLangGraphInterruptAction,
       }}
     >
       <CopilotMessages>{children}</CopilotMessages>

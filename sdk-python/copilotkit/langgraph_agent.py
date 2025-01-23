@@ -8,10 +8,11 @@ from langgraph.graph.graph import CompiledGraph
 from langchain.load.dump import dumps as langchain_dumps
 from langchain.schema import BaseMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig, ensure_config
+from langgraph.types import Command
 
 from partialjson.json_parser import JSONParser
 
-from .types import Message
+from .types import Message, MetaEvent
 from .langgraph import copilotkit_messages_to_langchain, langchain_messages_to_copilotkit
 from .action import ActionDict
 from .agent import Agent
@@ -218,8 +219,8 @@ class LangGraphAgent(Agent):
         thread_id: Optional[str] = None,
         node_name: Optional[str] = None,
         actions: Optional[List[ActionDict]] = None,
+        meta_events: Optional[List[MetaEvent]] = None
     ):
-
         config = ensure_config(cast(Any, self.langgraph_config.copy()) if self.langgraph_config else {}) # pylint: disable=line-too-long
         config["configurable"] = config.get("configurable", {})
         config["configurable"]["thread_id"] = thread_id
@@ -235,19 +236,26 @@ class LangGraphAgent(Agent):
             agent_name=self.name
         )
 
+        # Handle meta events for interrupts
+        interrupt_event = next((ev for ev in (meta_events or []) if ev.get("name") == "LangGraphInterruptEvent"), None)
+        input = None
+
+        if interrupt_event and interrupt_event.get("response"):
+            input = Command(resume=interrupt_event["response"])
 
         mode = "continue" if thread_id and node_name != "__end__" and node_name is not None else "start"
         thread_id = thread_id or str(uuid.uuid4())
         config["configurable"]["thread_id"] = thread_id
 
-        if mode == "continue":
+        if mode == "continue" and not interrupt_event:
             self.graph.update_state(config, state, as_node=node_name)
 
         return self._stream_events(
             mode=mode,
             config=config,
             state=state,
-            node_name=node_name
+            node_name=node_name,
+            input=input
         )
 
     async def _stream_events( # pylint: disable=too-many-locals
@@ -256,7 +264,8 @@ class LangGraphAgent(Agent):
             mode: str,
             config: RunnableConfig,
             state: Any,
-            node_name: Optional[str] = None
+            node_name: Optional[str] = None,
+            input: Optional[Command] = None
         ):
 
         streaming_state_extractor = _StreamingStateExtractor([])
@@ -267,11 +276,22 @@ class LangGraphAgent(Agent):
         manually_emitted_state = None
         thread_id = cast(Any, config)["configurable"]["thread_id"]
 
-        async for event in self.graph.astream_events(initial_state, config, version="v2"):
+        # Use provided input or fallback to initial_state
+        stream_input = input if input else initial_state
+
+        async for event in self.graph.astream_events(stream_input, config, version="v2"):
             current_node_name = event.get("name")
             event_type = event.get("event")
             run_id = event.get("run_id")
             metadata = event.get("metadata", {})
+
+            interrupt_event = event["data"]["chunk"].get("__interrupt__", None) if isinstance(event.get("data"), dict) and isinstance(event["data"].get("chunk"), dict) else None
+            if (interrupt_event):
+                yield langchain_dumps({
+                    "event": "on_interrupt",
+                    "value": interrupt_event[0].value
+                }) + "\n"
+                continue
 
             should_exit = should_exit or (
                 event_type == "on_custom_event" and
@@ -355,9 +375,10 @@ class LangGraphAgent(Agent):
             yield langchain_dumps(event) + "\n"
 
         state = await self.graph.aget_state(config)
-        is_end_node = state.next == ()
-
-        node_name = list(state.metadata["writes"].keys())[0]
+        tasks = self.graph.get_state(config).tasks
+        interrupts = tasks[0].interrupts if tasks and len(tasks) > 0 else None
+        node_name = node_name if interrupts else list(state.metadata["writes"].keys())[0]
+        is_end_node = state.next == () and not interrupts
 
         yield self._emit_state_sync_event(
             thread_id=thread_id,

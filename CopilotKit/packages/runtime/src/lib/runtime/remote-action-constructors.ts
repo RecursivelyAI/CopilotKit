@@ -42,6 +42,7 @@ export function constructLGCRemoteAction({
       threadId,
       nodeName,
       additionalMessages = [],
+      metaEvents,
     }: LangGraphAgentHandlerParams): Promise<Observable<RuntimeEvent>> => {
       logger.debug({ actionName: agent.name }, "Executing LangGraph Platform agent");
 
@@ -62,7 +63,7 @@ export function constructLGCRemoteAction({
 
       try {
         const response = await execute({
-          logger,
+          logger: logger.child({ component: "remote-actions.remote-lg-action.streamEvents" }),
           deploymentUrl: endpoint.deploymentUrl,
           langsmithApiKey: endpoint.langsmithApiKey,
           agent,
@@ -76,6 +77,7 @@ export function constructLGCRemoteAction({
             description: action.description,
             parameters: JSON.parse(action.jsonSchema) as string,
           })),
+          metaEvents,
         });
 
         const eventSource = new RemoteLangGraphEventSource();
@@ -174,6 +176,7 @@ export function constructRemoteActions({
           threadId,
           nodeName,
           additionalMessages = [],
+          metaEvents,
         }: LangGraphAgentHandlerParams): Promise<Observable<RuntimeEvent>> => {
           logger.debug({ actionName: agent.name }, "Executing remote agent");
 
@@ -209,6 +212,7 @@ export function constructRemoteActions({
                   description: action.description,
                   parameters: JSON.parse(action.jsonSchema),
                 })),
+                metaEvents,
               }),
             });
 

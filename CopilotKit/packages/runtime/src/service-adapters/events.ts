@@ -28,7 +28,25 @@ export enum RuntimeEventTypes {
   ActionExecutionEnd = "ActionExecutionEnd",
   ActionExecutionResult = "ActionExecutionResult",
   AgentStateMessage = "AgentStateMessage",
+  MetaEvent = "MetaEvent",
 }
+
+export enum RuntimeMetaEventName {
+  LangGraphInterruptEvent = "LangGraphInterruptEvent",
+  LangGraphInterruptResumeEvent = "LangGraphInterruptResumeEvent",
+}
+
+export type RunTimeMetaEvent =
+  | {
+      type: RuntimeEventTypes.MetaEvent;
+      name: RuntimeMetaEventName.LangGraphInterruptEvent;
+      value: string;
+    }
+  | {
+      type: RuntimeEventTypes.MetaEvent;
+      name: RuntimeMetaEventName.LangGraphInterruptResumeEvent;
+      value: string;
+    };
 
 export type RuntimeEvent =
   | { type: RuntimeEventTypes.TextMessageStart; messageId: string; parentMessageId?: string }
@@ -62,7 +80,8 @@ export type RuntimeEvent =
       role: string;
       state: string;
       running: boolean;
-    };
+    }
+  | RunTimeMetaEvent;
 
 interface RuntimeEventWithState {
   event: RuntimeEvent | null;

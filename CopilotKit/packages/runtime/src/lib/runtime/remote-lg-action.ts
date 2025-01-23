@@ -1,6 +1,6 @@
 import { Client } from "@langchain/langgraph-sdk";
 import { createHash } from "node:crypto";
-import { randomUUID, isValidUUID } from "@copilotkit/shared";
+import { isValidUUID, randomUUID } from "@copilotkit/shared";
 import { parse as parsePartialJson } from "partial-json";
 import { Logger } from "pino";
 import { ActionInput } from "../../graphql/inputs/action.input";
@@ -10,6 +10,9 @@ import { ActionExecutionMessage, Message, MessageType } from "../../graphql/type
 import { MessageRole } from "../../graphql/types/enums";
 import { CustomEventNames, LangGraphEventTypes } from "../../agents/langgraph/events";
 import telemetry from "../telemetry-client";
+import { MetaEventInput } from "../../graphql/inputs/meta-event.input";
+import { MetaEventName } from "../../graphql/types/meta-events.type";
+import { RunsStreamPayload } from "@langchain/langgraph-sdk/dist/types";
 
 type State = Record<string, any>;
 
@@ -24,6 +27,7 @@ interface ExecutionArgs extends Omit<LangGraphPlatformEndpoint, "agents"> {
   properties: CopilotRequestContextProperties;
   actions: ExecutionAction[];
   logger: Logger;
+  metaEvents?: MetaEventInput[];
 }
 
 // The following types are our own definition to the messages accepted by LangGraph Platform, enhanced with some of our extra data.
@@ -84,6 +88,7 @@ async function streamEvents(controller: ReadableStreamDefaultController, args: E
     messages,
     actions,
     logger,
+    metaEvents,
   } = args;
 
   let nodeName = initialNodeName;
@@ -130,7 +135,11 @@ async function streamEvents(controller: ReadableStreamDefaultController, args: E
   }
   state = langGraphDefaultMergeState(state, formattedMessages, actions, name);
 
-  if (mode === "continue") {
+  const lgInterruptEvent = metaEvents?.find(
+      (ev) => ev.name === MetaEventName.LangGraphInterruptEvent,
+  );
+
+  if (mode === "continue" && !lgInterruptEvent) {
     await client.threads.updateState(threadId, { values: state, asNode: nodeName });
   }
 
@@ -171,10 +180,18 @@ async function streamEvents(controller: ReadableStreamDefaultController, args: E
   let shouldExit = false;
   let externalRunId = null;
 
-  const streamResponse = client.runs.stream(threadId, assistantId, {
+  const payload: RunsStreamPayload = {
     input: streamInput,
-    streamMode: ["events", "values"],
-  });
+    streamMode: ["events", "values", "updates"],
+    command: undefined,
+  };
+
+  if (lgInterruptEvent?.response) {
+    console.log("[INTERRUPT-DEBUG] remote-lg-action.ts:183 - Received metaEventResponse");
+    payload.command = { resume: lgInterruptEvent.response };
+    console.log("Interrupt loop closed.", { command: payload.command });
+  }
+  const streamResponse = client.runs.stream(threadId, assistantId, payload);
 
   const emit = (message: string) => controller.enqueue(new TextEncoder().encode(message));
 
@@ -189,11 +206,22 @@ async function streamEvents(controller: ReadableStreamDefaultController, args: E
       hashedLgcKey: streamInfo.hashedLgcKey,
     });
     for await (const chunk of streamResponse) {
-      if (!["events", "values", "error"].includes(chunk.event)) continue;
+      if (!["events", "values", "error", "updates"].includes(chunk.event)) continue;
 
       if (chunk.event === "error") {
         throw new Error(`Error event thrown: ${chunk.data.message}`);
       }
+
+      if (chunk.event === "updates" && chunk.data.__interrupt__) {
+        emit(
+          JSON.stringify({
+            event: LangGraphEventTypes.OnInterrupt,
+            value: chunk.data.__interrupt__[0].value,
+          }) + "\n",
+        );
+        continue;
+      }
+      if (chunk.event === "updates") continue;
 
       if (chunk.event === "values") {
         latestStateValues = chunk.data;
@@ -317,8 +345,9 @@ async function streamEvents(controller: ReadableStreamDefaultController, args: E
     }
 
     state = await client.threads.getState(threadId);
-    const isEndNode = state.next.length === 0;
-    nodeName = Object.keys(state.metadata.writes)[0];
+    const interrupts = state.tasks?.[0]?.interrupts;
+    nodeName = interrupts ? nodeName : Object.keys(state.metadata.writes)[0];
+    const isEndNode = state.next.length === 0 && !interrupts;
 
     telemetry.capture("oss.runtime.agent_execution_stream_ended", streamInfo);
 

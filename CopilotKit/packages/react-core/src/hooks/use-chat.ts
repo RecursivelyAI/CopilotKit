@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import {
   FunctionCallHandler,
   COPILOT_CLOUD_PUBLIC_API_KEY_HEADER,
@@ -21,6 +21,7 @@ import {
   loadMessagesFromJsonRepresentation,
   ExtensionsInput,
   CopilotRuntimeClient,
+  langGraphInterruptEvent,
 } from "@copilotkit/runtime-client-gql";
 
 import { CopilotApiConfig } from "../context";
@@ -29,6 +30,11 @@ import { CoagentState } from "../types/coagent-state";
 import { AgentSession } from "../context/copilot-context";
 import { useCopilotRuntimeClient } from "./use-copilot-runtime-client";
 import { useAsyncCallback, useErrorToast } from "../components/error-boundary/error-utils";
+import {
+  LangGraphInterruptAction,
+  LangGraphInterruptActionSetter,
+} from "../types/interrupt-action";
+import { MetaEvent, MetaEventName } from "@copilotkit/runtime-client-gql";
 
 export type UseChatOptions = {
   /**
@@ -138,6 +144,10 @@ export type UseChatOptions = {
    * The setState-powered method to update the extensions.
    */
   setExtensions: React.Dispatch<React.SetStateAction<ExtensionsInput>>;
+
+  langGraphInterruptAction: LangGraphInterruptAction | null;
+
+  setLangGraphInterruptAction: LangGraphInterruptActionSetter;
 };
 
 export type UseChatHelpers = {
@@ -195,6 +205,8 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
     agentLock,
     extensions,
     setExtensions,
+    langGraphInterruptAction,
+    setLangGraphInterruptAction,
   } = options;
   const runChatCompletionRef = useRef<(previousMessages: Message[]) => Promise<Message[]>>();
   const addErrorToast = useErrorToast();
@@ -256,6 +268,7 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
             threadId: threadId,
             runId: runIdRef.current,
             extensions: extensionsRef.current,
+            metaEvents: composeAndFlushMetaEventsInput([langGraphInterruptAction?.event]),
             messages: convertMessagesToGqlInput(filterAgentStateMessages(messagesWithContext)),
             ...(copilotConfig.cloud
               ? {
@@ -343,6 +356,14 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
           messages = convertGqlOutputToMessages(
             filterAdjacentAgentStateMessages(value.generateCopilotResponse.messages),
           );
+
+          (value.generateCopilotResponse?.metaEvents ?? []).forEach((ev) => {
+            if (ev.name === "LangGraphInterruptEvent") {
+              setLangGraphInterruptAction({
+                event: langGraphInterruptEvent(ev),
+              });
+            }
+          });
 
           if (messages.length === 0) {
             continue;
@@ -606,6 +627,36 @@ export function useChat(options: UseChatOptions): UseChatHelpers {
       await runChatCompletionRef.current!(messages);
     },
     [messages],
+  );
+
+  // Go over all events and see that they include data that should be returned to the agent
+  const composeAndFlushMetaEventsInput = useCallback(
+    (metaEvents: (MetaEvent | undefined | null)[]) => {
+      return metaEvents.reduce((acc: MetaEvent[], event) => {
+        if (!event) return acc;
+
+        switch (event.name) {
+          case MetaEventName.LangGraphInterruptEvent:
+            if (event.response) {
+              // Flush interrupt event from state
+              setLangGraphInterruptAction(null);
+              return [
+                ...acc,
+                {
+                  type: event.type,
+                  name: event.name,
+                  value: event.value,
+                  response: event.response,
+                },
+              ];
+            }
+            return acc;
+          default:
+            return acc;
+        }
+      }, []);
+    },
+    [setLangGraphInterruptAction],
   );
 
   const append = useAsyncCallback(

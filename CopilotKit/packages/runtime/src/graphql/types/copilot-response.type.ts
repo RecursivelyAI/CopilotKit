@@ -3,6 +3,7 @@ import { MessageRole } from "./enums";
 import { MessageStatusUnion } from "./message-status.type";
 import { ResponseStatusUnion } from "./response-status.type";
 import { ExtensionsResponse } from "./extensions-response.type";
+import { BaseMetaEvent, LangGraphInterruptEvent, MetaEventName } from "./meta-events.type";
 
 @InterfaceType({
   resolveType(value) {
@@ -14,6 +15,8 @@ import { ExtensionsResponse } from "./extensions-response.type";
       return ResultMessageOutput;
     } else if (value.hasOwnProperty("state")) {
       return AgentStateMessageOutput;
+    } else if (value.name === MetaEventName.LangGraphInterruptEvent) {
+      return LangGraphInterruptEvent;
     }
     return undefined;
   },
@@ -114,4 +117,7 @@ export class CopilotResponse {
 
   @Field(() => ExtensionsResponse, { nullable: true })
   extensions?: ExtensionsResponse;
+
+  @Field(() => [BaseMetaEvent], { nullable: true })
+  metaEvents?: (typeof BaseMetaEvent)[];
 }
