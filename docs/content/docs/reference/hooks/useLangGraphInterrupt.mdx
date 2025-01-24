@@ -1,0 +1,85 @@
+---
+title: "useLangGraphInterrupt"
+description: "A React hook for handling LangGraph interrupt events with UI components or programmatic responses."
+---
+
+<Callout type="info">
+  Usage of this hook assumes some additional setup in your application, for more information
+  on that see the CoAgents <span className="text-blue-500">[Human-in-the-loop with Interrupt](/coagents/react-ui/hitl-interrupt)</span>.
+</Callout>
+ 
+The `useLangGraphInterrupt` hook enables handling of LangGraph interrupt events through UI components or programmatic responses.
+ 
+## Usage
+ 
+### Basic Example
+ 
+```tsx
+import { useLangGraphInterrupt } from "@copilotkit/react-core";
+ 
+useLangGraphInterrupt({
+  render: ({ result, event, resolve }) => {
+    const handleAuth = () => {
+      const authenticated = checkAuth();
+      resolve(authenticated ? 'success' : 'failure');
+    };
+
+    return (
+      <div>
+        <p>Authentication Required</p>
+        <Button onClick={handleAuth}>Sign In</Button>
+      </div>
+    );
+  },
+});
+```
+
+## Parameters
+
+<PropertyReference name="action" type="Action" required>
+    Configuration object for interrupt handling. Requires either `render`, `handler`, or both.
+
+    <PropertyReference name="handler" type="(args) => Promise<any>">
+        Programmatic handler for interrupt events.
+
+        <div className="ml-8">
+            <PropertyReference name="event" type="LangGraphInterruptEvent" required>
+                The interrupt event object:
+                - `name`: Event identifier (LangGraphInterruptEvent)
+                - `value`: String value from interrupt() call
+                - `response`: Optional response string
+            </PropertyReference>
+
+            <PropertyReference name="resolve" type="(result: string) => void" required>
+                Resolves the interrupt with a response value. When using with `render`, only call resolve in the render function.
+            </PropertyReference>
+        </div>
+    </PropertyReference>
+
+    <PropertyReference name="render" type="(args) => string | React.ReactElement">
+        Function to render UI for the interrupt event.
+
+        <div className="ml-8">
+            <PropertyReference name="result" type="any" required>
+                Return value from the handler function, if specified
+            </PropertyReference>
+
+            <PropertyReference name="event" type="LangGraphInterruptEvent" required>
+                The interrupt event object:
+                - `name`: Event identifier (LangGraphInterruptEvent)
+                - `value`: String value from interrupt() call
+                - `response`: Optional response string
+            </PropertyReference>
+
+            <PropertyReference name="resolve" type="(result: string) => void" required>
+                Resolves the interrupt with a response value
+            </PropertyReference>
+        </div>
+    </PropertyReference>
+
+</PropertyReference>
+
+<PropertyReference name="dependencies" type="any[]">
+    Optional dependency array for the hook
+</PropertyReference>
+

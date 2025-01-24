@@ -6,6 +6,7 @@
     "useCopilotChat",
     "useCopilotChatSuggestions",
     "useCoAgent",
-    "useCoAgentStateRender"
+    "useCoAgentStateRender",
+    "useLangGraphInterrupt"
   ]
 }
