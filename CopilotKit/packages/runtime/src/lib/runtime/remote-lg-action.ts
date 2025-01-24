@@ -136,7 +136,7 @@ async function streamEvents(controller: ReadableStreamDefaultController, args: E
   state = langGraphDefaultMergeState(state, formattedMessages, actions, name);
 
   const lgInterruptEvent = metaEvents?.find(
-      (ev) => ev.name === MetaEventName.LangGraphInterruptEvent,
+    (ev) => ev.name === MetaEventName.LangGraphInterruptEvent,
   );
 
   if (mode === "continue" && !lgInterruptEvent) {
