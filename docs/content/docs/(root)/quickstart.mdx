@@ -9,6 +9,7 @@ import SelfHostingCopilotRuntimeCreateEndpoint from "@/snippets/self-hosting-cop
 import SelfHostingCopilotRuntimeConfigureCopilotKitProvider from "@/snippets/self-hosting-copilot-runtime-configure-copilotkit-provider.mdx";
 import ConnectCopilotUI from "@/snippets/copilot-ui.mdx";
 import CopilotCloudConfigureCopilotKitProvider from "@/snippets/copilot-cloud-configure-copilotkit-provider.mdx";
+import CloudCopilotKitProvider from "@/snippets/cloud/cloud-copilotkit-provider.mdx";
 import {
   TailoredContent,
   TailoredContentOption,
@@ -22,24 +23,39 @@ import { FaCloud, FaServer } from "react-icons/fa";
   icon={<FaCloud />}
 >
 
-## Install Dependencies
+<Steps>
+<Step>
+## Install CopilotKit
 
-<Callout type="warn">
-  Next.js 15 with `--turbopack` option (i.e. `"dev": "next dev --turbopack"`) is
-  currently not supported with CopilotKit.
-</Callout>
-
-First, install the latest pre-release CopilotKit dependencies.
+First, install the latest packages for CopilotKit.
 
 ```package-install
 npm install @copilotkit/react-ui @copilotkit/react-core
 ```
 
-In order to use CopilotKit, we'll need to configure the `CopilotKit` provider.
+</Step>
+<Step>
+## Get a Copilot Cloud Public API Key
+Navigate to [Copilot Cloud](https://cloud.copilotkit.ai) and follow the instructions to get a public API key - it's free!
+</Step>
+<Step>
+## Setup the CopilotKit Provider
 
-## Setup CopilotKit
+The [`<CopilotKit>`](/reference/components/CopilotKit) component must wrap the Copilot-aware parts of your application. For most use-cases, 
+it's appropriate to wrap the CopilotKit provider around the entire app, e.g. in your layout.tsx.
 
-<CopilotCloudConfigureCopilotKitProvider components={props.components} />
+<CloudCopilotKitProvider components={props.components} />
+
+</Step>
+<Step>
+## Choose a Copilot UI
+
+You are almost there! Now it's time to setup your Copilot UI.
+
+<ConnectCopilotUI components={props.components} />
+
+</Step>
+</Steps>
 </TailoredContentOption>
 <TailoredContentOption
   title="Self-hosting"
@@ -47,44 +63,39 @@ In order to use CopilotKit, we'll need to configure the `CopilotKit` provider.
   icon={<FaServer />}
 >
 
-## Install Dependencies
-
-<Callout type="warn">
-  Next.js 15 with `--turbopack` option (i.e. `"dev": "next dev --turbopack"`) is
-  currently not supported with CopilotKit.
-</Callout>
-
-First, install the latest pre-release CopilotKit dependencies.
+<Steps>
+<Step>
+## Install CopilotKit
+First, install the latest packages for CopilotKit.
 
 ```package-install
 npm install @copilotkit/react-ui @copilotkit/react-core @copilotkit/runtime
 ```
-
-## Setup CopilotKit
-
-<Steps>
+</Step>
 <Step>
-### Set up Copilot Runtime Endpoint
+## Set up a Copilot Runtime Endpoint
+
 <SelfHostingCopilotRuntimeCreateEndpoint components={props.components} />
 </Step>
 <Step>
-### Configure the CopilotKit Provider
+## Configure the CopilotKit Provider
 
 <SelfHostingCopilotRuntimeConfigureCopilotKitProvider
   components={props.components}
 />
 
 </Step>
+<Step>
+## Choose a Copilot UI
+
+You are almost there! Now it's time to setup your Copilot UI.
+
+<ConnectCopilotUI components={props.components} />
+
+</Step>
 </Steps>
 </TailoredContentOption>
 </TailoredContent>
-
-### Connect Copilot UI
-
-You are almost there!
-Now it's time to setup your Copilot UI.
-
-<ConnectCopilotUI components={props.components} />
 
 ---
 

@@ -1,26 +1,17 @@
+```tsx title="layout.tsx"
+import "./globals.css";
+import { ReactNode } from "react";
+import { CopilotKit } from "@copilotkit/react-core"; // [!code highlight]
 
-The [`<CopilotKit>`](/reference/components/CopilotKit) provider must wrap the Copilot-aware parts of your application.
-For most use-cases, it's appropriate to wrap the `CopilotKit` provider around the entire app, e.g. in your `layout.tsx`
-
-<Callout type="info">
-  Note that you can add the `<CopilotKit>` provider anywhere in your application. In fact, you can have multiple `<CopilotKit>` providers per app if you want independent copilots.
-</Callout>
-
-Point it at the Copilot Runtime URL you configured in the previous step.
-
-  ```tsx title="layout.tsx"
-  import { ReactNode } from "react";
-  import { CopilotKit } from "@copilotkit/react-core"; // [!code highlight]
-
-  export default function RootLayout({ children }: { children: ReactNode }) {
-    return (
-      <html lang="en">
-        <body> 
-          {/* Make sure to use the URL you configured in the previous step  */} // [!code highlight:4]
-          <CopilotKit runtimeUrl="/api/copilotkit"> 
-            {children}
-          </CopilotKit>
-        </body>
-      </html>
-    );
-  }
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body> 
+        {/* Make sure to use the URL you configured in the previous step  */} // [!code highlight:4]
+        <CopilotKit runtimeUrl="/api/copilotkit"> 
+          {children}
+        </CopilotKit>
+      </body>
+    </html>
+  );
+}
