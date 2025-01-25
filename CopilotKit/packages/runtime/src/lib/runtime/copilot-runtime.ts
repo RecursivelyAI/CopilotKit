@@ -169,6 +169,14 @@ export interface CopilotRuntimeConstructorParams<T extends Parameter[] | [] = []
    * An array of LangServer URLs.
    */
   langserve?: RemoteChainParameters[];
+
+  /*
+   * Delegates agent state processing to the service adapter.
+   *
+   * When enabled, individual agent state requests will not be processed by the agent itself.
+   * Instead, all processing will be handled by the service adapter.
+   */
+  delegateAgentProcessingToServiceAdapter?: boolean;
 }
 
 export class CopilotRuntime<const T extends Parameter[] | [] = []> {
@@ -177,6 +185,7 @@ export class CopilotRuntime<const T extends Parameter[] | [] = []> {
   private langserve: Promise<Action<any>>[] = [];
   private onBeforeRequest?: OnBeforeRequestHandler;
   private onAfterRequest?: OnAfterRequestHandler;
+  private delegateAgentProcessingToServiceAdapter: boolean;
 
   constructor(params?: CopilotRuntimeConstructorParams<T>) {
     this.actions = params?.actions || [];
@@ -190,6 +199,8 @@ export class CopilotRuntime<const T extends Parameter[] | [] = []> {
 
     this.onBeforeRequest = params?.middleware?.onBeforeRequest;
     this.onAfterRequest = params?.middleware?.onAfterRequest;
+    this.delegateAgentProcessingToServiceAdapter =
+      params?.delegateAgentProcessingToServiceAdapter || false;
   }
 
   async processRuntimeRequest(request: CopilotRuntimeRequest): Promise<CopilotRuntimeResponse> {
@@ -202,15 +213,16 @@ export class CopilotRuntime<const T extends Parameter[] | [] = []> {
       outputMessagesPromise,
       graphqlContext,
       forwardedParameters,
-      agentSession,
       url,
       extensions,
+      agentSession,
+      agentStates,
     } = request;
 
     const eventSource = new RuntimeEventSource();
 
     try {
-      if (agentSession) {
+      if (agentSession && !this.delegateAgentProcessingToServiceAdapter) {
         return await this.processAgentRequest(request);
       }
       if (serviceAdapter instanceof EmptyAdapter) {
@@ -222,7 +234,6 @@ please use an LLM adapter instead.`,
       }
 
       const messages = rawMessages.filter((message) => !message.agentStateMessage);
-
       const inputMessages = convertGqlInputToMessages(messages);
       const serverSideActions = await this.getServerSideActions(request);
 
@@ -256,6 +267,8 @@ please use an LLM adapter instead.`,
         eventSource,
         forwardedParameters,
         extensions,
+        agentSession,
+        agentStates,
       });
 
       // for backwards compatibility, we deal with the case that no threadId is provided

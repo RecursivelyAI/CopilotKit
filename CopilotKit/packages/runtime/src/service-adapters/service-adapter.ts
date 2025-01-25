@@ -4,6 +4,8 @@ import { ActionInput } from "../graphql/inputs/action.input";
 import { ForwardedParametersInput } from "../graphql/inputs/forwarded-parameters.input";
 import { ExtensionsInput } from "../graphql/inputs/extensions.input";
 import { ExtensionsResponse } from "../graphql/types/extensions-response.type";
+import { AgentSessionInput } from "../graphql/inputs/agent-session.input";
+import { AgentStateInput } from "../graphql/inputs/agent-state.input";
 
 export interface CopilotKitResponse {
   stream: ReadableStream;
@@ -19,6 +21,8 @@ export interface CopilotRuntimeChatCompletionRequest {
   runId?: string;
   forwardedParameters?: ForwardedParametersInput;
   extensions?: ExtensionsInput;
+  agentSession?: AgentSessionInput;
+  agentStates?: AgentStateInput[];
 }
 
 export interface CopilotRuntimeChatCompletionResponse {
