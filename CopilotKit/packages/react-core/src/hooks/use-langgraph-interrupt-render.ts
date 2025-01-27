@@ -4,7 +4,11 @@ import React, { useCallback } from "react";
 type InterruptProps = {
   event: any;
   result: any;
-  render: (props: { event: any; result: any; resolve: (response: string) => void }) => string | React.ReactElement;
+  render: (props: {
+    event: any;
+    result: any;
+    resolve: (response: string) => void;
+  }) => string | React.ReactElement;
   resolve: (response: string) => void;
 };
 
@@ -30,7 +34,7 @@ export function useLangGraphInterruptRender(): string | React.ReactElement | nul
   if (
     !langGraphInterruptAction ||
     !langGraphInterruptAction.event ||
-    (!langGraphInterruptAction.render)
+    !langGraphInterruptAction.render
   )
     return null;
 
@@ -48,6 +52,6 @@ export function useLangGraphInterruptRender(): string | React.ReactElement | nul
     event,
     result,
     render,
-    resolve: resolveInterrupt
+    resolve: resolveInterrupt,
   });
 }
