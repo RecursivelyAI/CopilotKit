@@ -5,6 +5,7 @@ import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
 import { CopilotPopup } from "@copilotkit/react-ui";
 import { useState } from "react";
 import { useCopilotChatSuggestions } from "@copilotkit/react-ui";
+import { useLangGraphInterrupt } from "@copilotkit/react-core";
 
 export function Mailer() {
   const { model } = useModelSelectorContext();
@@ -39,6 +40,30 @@ export function Mailer() {
       return action;
     },
   });
+
+  useLangGraphInterrupt({
+    render: ({ event, resolve }) => {
+      const [name, setName] = useState<string>("");
+      return (
+        <div className="flex flex-col gap-4 p-4">
+          <div className="text-lg font-medium">{event.value}</div>
+          <input 
+            type="text"
+            placeholder="John Doe"
+            className="border p-2 rounded"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <button
+            onClick={() => resolve(name)} 
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Submit
+          </button>
+        </div>
+      );
+    }
+  })
 
   return (
     <div

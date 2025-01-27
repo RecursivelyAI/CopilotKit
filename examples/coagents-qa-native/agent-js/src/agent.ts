@@ -9,7 +9,7 @@ import {
 } from "@copilotkit/sdk-js/langgraph";
 import { AIMessage, HumanMessage, ToolMessage } from "@langchain/core/messages";
 import { getModel } from "./model";
-import { END, MemorySaver, StateGraph } from "@langchain/langgraph";
+import { END, MemorySaver, StateGraph, interrupt } from "@langchain/langgraph";
 import { AgentState, AgentStateAnnotation } from "./state";
 
 export async function email_node(state: AgentState, config: RunnableConfig) {
@@ -17,7 +17,8 @@ export async function email_node(state: AgentState, config: RunnableConfig) {
    * Write an email.
    */
 
-  const instructions = "You write emails.";
+  const sender = state.sender ?? interrupt('Please provide a sender name which will appear in the email');
+  const instructions = `You write emails. The email is by the following sender: ${sender}`;
 
   const email_model = getModel(state).bindTools!(
     convertActionsToDynamicStructuredTools(state.copilotkit.actions),
@@ -38,6 +39,7 @@ export async function email_node(state: AgentState, config: RunnableConfig) {
   return {
     messages: response,
     email: email,
+    sender,
   };
 }
 
