@@ -1,6 +1,17 @@
 import { useCopilotContext } from "../context";
 import React, { useCallback } from "react";
 
+type InterruptProps = {
+  event: any;
+  result: any;
+  render: (props: { event: any; result: any; resolve: (response: string) => void }) => string | React.ReactElement;
+  resolve: (response: string) => void;
+};
+
+const InterruptRenderer: React.FC<InterruptProps> = ({ event, result, render, resolve }) => {
+  return render({ event, result, resolve });
+};
+
 export function useLangGraphInterruptRender(): string | React.ReactElement | null {
   const { langGraphInterruptAction, setLangGraphInterruptAction } = useCopilotContext();
 
@@ -19,7 +30,7 @@ export function useLangGraphInterruptRender(): string | React.ReactElement | nul
   if (
     !langGraphInterruptAction ||
     !langGraphInterruptAction.event ||
-    (!langGraphInterruptAction.render && !langGraphInterruptAction.handler)
+    (!langGraphInterruptAction.render)
   )
     return null;
 
@@ -33,13 +44,10 @@ export function useLangGraphInterruptRender(): string | React.ReactElement | nul
     });
   }
 
-  if (render) {
-    return render({
-      event,
-      result,
-      resolve: resolveInterrupt,
-    });
-  }
-
-  return null;
+  return React.createElement(InterruptRenderer, {
+    event,
+    result,
+    render,
+    resolve: resolveInterrupt
+  });
 }
