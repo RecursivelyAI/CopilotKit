@@ -4,13 +4,13 @@ import { IoLogoVercel, IoLogoNodejs } from "react-icons/io5";
 import { SiNestjs } from "react-icons/si";
 import { RiNextjsLine } from "react-icons/ri";
 
+<MultiProviderContent providersConfig={quickStartProviders}>
 <Callout type="info">
   If you are planning to use a single LangGraph agent in [agent-lock mode](/coagents/advanced/router-mode-agent-lock#agent-lock-mode) as your agentic backend, your LLM adapter will only be used for peripherals such as suggestions, etc.
 
   If you are not sure yet, simply ignore this note.
 </Callout>
 
-<MultiProviderContent providersConfig={quickStartProviders}>
     <If conditions={[{ key: 'id', value: 'langchain' }]}>
         <Callout type="info">
             The LangChain adapter shown here is using OpenAI, but can be used with any LLM!
@@ -26,7 +26,7 @@ import { RiNextjsLine } from "react-icons/ri";
     </If>
 
     <If conditions={[{ key: 'packageName', value: true }]}>
-        Install provider package:
+        ### Install provider package
 
         ```package-install
         npm install {{packageName}}
@@ -34,7 +34,9 @@ import { RiNextjsLine } from "react-icons/ri";
     </If>
 
     <If conditions={[{ key: 'envVarName', value: true }]}>
-        Add your API key to your `.env` file in the root of your project (unless you provide it directly to the client):
+        ### Add your API key
+
+        Next, add your API key to your `.env` file in the root of your project (unless you prefer to provide it directly to the client):
 
         ```plaintext title=".env"
         {{envVarName}}=your_api_key_here
@@ -47,8 +49,7 @@ import { RiNextjsLine } from "react-icons/ri";
         </Callout>
     </If>
 
-
-    #### Endpoint Setup
+    ### Setup the Runtime Endpoint
 
     <Tabs items={[
         { value: 'Next.js App Router', icon: <RiNextjsLine className="text-xl" /> },
