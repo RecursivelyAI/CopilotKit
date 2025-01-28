@@ -1,0 +1,10 @@
+{
+  "title": "Cloud",
+  "root": true,
+  "pages": [
+    "index",
+    "---Features---",
+    "features/authentication",
+    "features/guardrails"
+  ]
+}

@@ -1,0 +1,29 @@
+---
+title: Guardrails
+---
+
+## Introduction
+
+CopilotKit Cloud provides content moderation capabilities through the `guardrails_c` configuration, helping ensure safe and appropriate AI interactions. The system uses OpenAI's content moderation capabilities to enforce these guardrails.
+
+## Implementation
+
+```tsx
+import { CopilotKit } from "@copilotkit/react-core";
+
+export default function App() {
+  return (
+    <CopilotKit
+      publicApiKey={process.env.COPILOTKIT_PUBLIC_API_KEY}
+      guardrails_c={{
+        // Topics to explicitly block
+        invalidTopics: ["politics", "explicit-content", "harmful-content"],
+        // Topics to explicitly allow
+        validTopics: ["business", "technology", "general-assistance"],
+      }}
+    >
+      {/* Your app */}
+    </CopilotKit>
+  );
+}
+```

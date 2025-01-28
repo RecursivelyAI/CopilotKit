@@ -4,7 +4,7 @@ import { baseOptions } from "../layout.config";
 import { source } from "@/app/source";
 import { SubdocsMenu } from "@/components/react/subdocs-menu";
 import { TerminalIcon, RocketIcon } from "lucide-react";
-import { PiGraph, PiGraduationCap} from "react-icons/pi";
+import { PiGraph, PiGraduationCap, PiCloudLightning } from "react-icons/pi";
 import { TopBar } from "@/components/layout/top-bar";
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -36,6 +36,15 @@ export default function Layout({ children }: { children: ReactNode }) {
                   bgGradient:
                     "bg-gradient-to-b from-purple-700 to-purple-400 text-purple-100",
                   selectedStyle: "ring-purple-500/70 ring-2 rounded-sm",
+                },
+                {
+                  title: "Cloud",
+                  description: "Documentation for CopilotKit Cloud",
+                  url: "/cloud",
+                  icon: <PiCloudLightning className="w-4 h-4" />,
+                  bgGradient:
+                    "bg-gradient-to-b from-blue-700 to-blue-400 text-blue-100",
+                  selectedStyle: "ring-blue-500/70 ring-2 rounded-sm",
                 },
                 {
                   title: "API Reference",
