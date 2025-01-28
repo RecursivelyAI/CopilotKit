@@ -1,0 +1,129 @@
+---
+title: Human-in-the-loop with Interrupt
+description: Use LangGraph's Interrupt feature for human-in-the-loop interactions
+---
+import InstallSDKSnippet from "@/snippets/install-sdk.mdx"
+import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
+
+LangGraph's `interrupt` feature provides a powerful way to pause graph execution and get human input. CopilotKit makes it easy to handle these interrupts in your React application.
+
+## Backend Implementation
+
+Here's a simple example of using LangGraph's `interrupt` function. For a complete guide on human-in-the-loop patterns with LangGraph, see their [official documentation](https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/).
+
+<Tabs items={['Python', 'TypeScript']} default="Python">
+    <Tab value="Python">
+        ```python
+        from copilotkit import interrupt
+
+        async def review_node(state):
+            # Pause execution and wait for user input
+            response = await interrupt("Does this look good?")
+            
+            if response == "YES":
+                return {"next": "proceed_node"}
+            return {"next": "revise_node"}
+        ```
+    </Tab>
+    <Tab value="TypeScript">
+        ```typescript
+        import { interrupt } from "@copilotkit/shared";
+
+        async function reviewNode(state: State) {
+          // Pause execution and wait for user input
+          const response = await interrupt("Does this look good?");
+          
+          if (response === "YES") {
+            return { next: "proceed_node" };
+          }
+          return { next: "revise_node" };
+        }
+        ```
+    </Tab>
+</Tabs>
+
+## Frontend Setup
+
+You can handle interrupts in two ways: using a `handler` for logic-only processing, or a `render` function for UI interactions. The `handler` can also be used to preprocess data before rendering.
+
+### Handler-only approach (no UI)
+
+```tsx
+useLangGraphInterrupt({
+  handler: ({ event, resolve }) => {
+    // Process the interrupt without UI
+    if (event.value === "need_auth") {
+      const isAuthed = checkAuth();
+      resolve(isAuthed ? "YES" : "NO");
+    }
+  }
+});
+```
+
+### Render-only approach (with UI)
+
+```tsx
+useLangGraphInterrupt({
+  render: ({ event, resolve }) => (
+    <div className="review-prompt">
+      <p>{event.value}</p>
+      <div className="actions">
+        <Button onClick={() => resolve("YES")}>Approve</Button>
+        <Button onClick={() => resolve("NO")}>Reject</Button>
+      </div>
+    </div>
+  )
+});
+```
+
+### Combined approach (preprocessing + UI)
+
+```tsx
+useLangGraphInterrupt({
+  handler: ({ event }) => {
+    // Process data before rendering
+    const processedData = someProcessing(event.value);
+    return processedData;
+  },
+  render: ({ event, result, resolve }) => (
+    <div className="review-prompt">
+      <p>{event.value}</p>
+      <div className="processed-data">{result}</div>
+      <div className="actions">
+        <Button onClick={() => resolve("YES")}>Approve</Button>
+        <Button onClick={() => resolve("NO")}>Reject</Button>
+      </div>
+    </div>
+  )
+});
+```
+
+<Callout type="warning">
+Important: If you use a `handler`, only resolve the interrupt there if you don't need UI interaction. Don't specify a `render` function if you've already resolved in the handler.
+</Callout>
+
+## Behind the Scenes
+
+The interrupt mechanism works through a series of steps:
+1. When `interrupt()` is called, the agent pauses execution and emits an event
+2. The frontend's `useLangGraphInterrupt` hook receives this event
+3. Based on the configuration, it processes the event through the handler and/or renders UI components
+4. Upon calling `resolve()`, the response is sent back to resume agent execution
+
+It's important to note that the interrupt process is transparent to the LLM. The agent has no memory or context of the interrupt interaction - it simply receives the resolved value and continues execution. This means the agent cannot reference or recall the interrupt interaction in subsequent conversations.
+
+<Accordions>
+<Accordion title="Advanced Usage">
+You can also pass data with your interrupts:
+
+```typescript
+const result = await interrupt({
+  message: "Review required",
+  data: { 
+    type: "code_review",
+    changes: ["file1.ts", "file2.ts"]
+  }
+});
+```
+</Accordion>
+</Accordions>

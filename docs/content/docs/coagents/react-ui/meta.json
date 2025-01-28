@@ -4,6 +4,7 @@
   "pages": [
     "in-app-agent-read",
     "in-app-agent-write",
-    "hitl"
+    "hitl",
+    "hitl-interrupt"
   ]
 }

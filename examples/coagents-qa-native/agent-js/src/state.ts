@@ -5,6 +5,7 @@ import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 export const AgentStateAnnotation = Annotation.Root({
   model: Annotation<string>,
   email: Annotation<string>,
+  sender: Annotation<string>,
   ...CopilotKitStateAnnotation.spec,
 });
 

@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { MessagesProps } from "./props";
 import { useChatContext } from "./ChatContext";
 import { Message, ResultMessage, TextMessage, Role } from "@copilotkit/runtime-client-gql";
+import { useLangGraphInterruptRender } from "@copilotkit/react-core";
 
 export const Messages = ({
   messages,
@@ -19,6 +20,7 @@ export const Messages = ({
     () => makeInitialMessages(context.labels.initial),
     [context.labels.initial],
   );
+
   messages = [...initialMessages, ...messages];
 
   const actionResults: Record<string, string> = {};
@@ -37,6 +39,8 @@ export const Messages = ({
   }
 
   const { messagesEndRef, messagesContainerRef } = useScrollToBottom(messages);
+
+  const interrupt = useLangGraphInterruptRender();
 
   return (
     <div className="copilotKitMessages" ref={messagesContainerRef}>
@@ -94,6 +98,7 @@ export const Messages = ({
           );
         }
       })}
+      {interrupt}
       <footer ref={messagesEndRef}>{children}</footer>
     </div>
   );

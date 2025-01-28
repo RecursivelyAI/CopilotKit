@@ -11,6 +11,11 @@ export enum LangGraphEventTypes {
   OnCopilotKitEmitMessage = "on_copilotkit_emit_message",
   OnCopilotKitEmitToolCall = "on_copilotkit_emit_tool_call",
   OnCustomEvent = "on_custom_event",
+  OnInterrupt = "on_interrupt",
+}
+
+export enum MetaEventNames {
+  LangGraphInterruptEvent = "LangGraphInterruptEvent",
 }
 
 export enum CustomEventNames {
@@ -325,6 +330,11 @@ type LangGraphOnCustomEvent = {
   parent_ids: string[];
 };
 
+interface LangGraphInterruptEvent {
+  event: LangGraphEventTypes.OnInterrupt;
+  value: string;
+}
+
 export type LangGraphEvent =
   | LangGraphOnChainStartEvent
   | LangGraphOnChainStreamEvent
@@ -335,4 +345,5 @@ export type LangGraphEvent =
   | LangGraphOnToolStartEvent
   | LangGraphOnToolEndEvent
   | LangGraphOnCopilotKitStateSyncEvent
-  | LangGraphOnCustomEvent;
+  | LangGraphOnCustomEvent
+  | LangGraphInterruptEvent;

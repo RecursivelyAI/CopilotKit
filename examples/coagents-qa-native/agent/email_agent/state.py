@@ -9,3 +9,4 @@ class EmailAgentState(CopilotKitState):
     """Email Agent State"""
     email: str
     model: str
+    sender: str

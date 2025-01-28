@@ -16,6 +16,10 @@ import {
   ForwardedParametersInput,
 } from "@copilotkit/runtime-client-gql";
 import { Agent } from "@copilotkit/runtime-client-gql";
+import {
+  LangGraphInterruptAction,
+  LangGraphInterruptActionSetter,
+} from "../types/interrupt-action";
 
 /**
  * Interface for the configuration of the Copilot API.
@@ -77,9 +81,8 @@ export interface CopilotApiConfig {
   credentials?: RequestCredentials;
 }
 
-export type InChatRenderFunction = (
-  props: ActionRenderProps<any> | CatchAllActionRenderProps<any>,
-) => string | JSX.Element;
+export type InChatRenderFunction<TProps = ActionRenderProps<any> | CatchAllActionRenderProps<any>> =
+  (props: TProps) => string | JSX.Element;
 export type CoagentInChatRenderFunction = (
   props: CoAgentStateRenderProps<any>,
 ) => string | JSX.Element | undefined | null;
@@ -200,6 +203,9 @@ export interface CopilotContextParams {
 
   extensions: ExtensionsInput;
   setExtensions: React.Dispatch<React.SetStateAction<ExtensionsInput>>;
+  langGraphInterruptAction: LangGraphInterruptAction | null;
+  setLangGraphInterruptAction: LangGraphInterruptActionSetter;
+  removeLangGraphInterruptAction: () => void;
 }
 
 const emptyCopilotContext: CopilotContextParams = {
@@ -263,6 +269,9 @@ const emptyCopilotContext: CopilotContextParams = {
   availableAgents: [],
   extensions: {},
   setExtensions: () => {},
+  langGraphInterruptAction: null,
+  setLangGraphInterruptAction: () => null,
+  removeLangGraphInterruptAction: () => null,
 };
 
 export const CopilotContext = React.createContext<CopilotContextParams>(emptyCopilotContext);

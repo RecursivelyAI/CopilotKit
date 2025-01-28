@@ -8,7 +8,7 @@ from typing import List, Callable, Union, Optional, Any, Coroutine
 from typing_extensions import TypedDict, Tuple
 from .agent import Agent, AgentDict
 from .action import Action, ActionDict, ActionResultDict
-from .types import Message
+from .types import Message, MetaEvent
 from .exc import (
     ActionNotFoundException,
     AgentNotFoundException,
@@ -266,6 +266,7 @@ class CopilotKitRemoteEndpoint:
         state: dict,
         messages: List[Message],
         actions: List[ActionDict],
+        meta_events: Optional[List[MetaEvent]] = None,
     ) -> Any:
         """
         Execute an agent
@@ -285,6 +286,7 @@ class CopilotKitRemoteEndpoint:
                 ("State", state),
                 ("Messages", messages),
                 ("Actions", actions),
+                ("MetaEvents", meta_events),
             ]
         )
 
@@ -295,6 +297,7 @@ class CopilotKitRemoteEndpoint:
                 state=state,
                 messages=messages,
                 actions=actions,
+                meta_events=meta_events
             )
         except Exception as error:
             raise AgentExecutionException(name, error) from error

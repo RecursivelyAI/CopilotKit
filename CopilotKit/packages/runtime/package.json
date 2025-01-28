@@ -52,7 +52,7 @@
     "@langchain/community": "^0.0.53",
     "@langchain/core": "^0.3.13",
     "@langchain/google-gauth": "^0.1.0",
-    "@langchain/langgraph-sdk": "^0.0.16",
+    "@langchain/langgraph-sdk": "^0.0.36",
     "@langchain/openai": "^0.0.28",
     "class-transformer": "^0.5.1",
     "express": "^4.19.2",

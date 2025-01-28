@@ -8,6 +8,7 @@ from langchain_core.messages import HumanMessage, ToolMessage, AIMessage
 from copilotkit.langgraph import (
   copilotkit_customize_config, copilotkit_exit, copilotkit_emit_message
 )
+from langgraph.types import interrupt
 from email_agent.model import get_model
 from email_agent.state import EmailAgentState
 
@@ -17,13 +18,16 @@ async def email_node(state: EmailAgentState, config: RunnableConfig):
     Write an email.
     """
 
+    sender = state.get("sender", None)
+    if sender is None:
+        sender = interrupt('Please provide a sender name which will appear in the email')
 
     config = copilotkit_customize_config(
         config,
         emit_tool_calls=True,
     )
 
-    instructions = "You write emails."
+    instructions = f"You write emails. The email is by the following sender: {sender}"
 
     email_model = get_model(state).bind_tools(
         state["copilotkit"]["actions"],
@@ -44,6 +48,7 @@ async def email_node(state: EmailAgentState, config: RunnableConfig):
     return {
         "messages": response,
         "email": email,
+        "sender": sender,
     }
 
 async def send_email_node(state: EmailAgentState, config: RunnableConfig):

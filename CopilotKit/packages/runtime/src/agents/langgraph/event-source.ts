@@ -1,6 +1,10 @@
-import { ReplaySubject, scan, mergeMap, catchError } from "rxjs";
+import { catchError, mergeMap, ReplaySubject, scan } from "rxjs";
 import { CustomEventNames, LangGraphEvent, LangGraphEventTypes } from "./events";
-import { RuntimeEvent, RuntimeEventTypes } from "../../service-adapters/events";
+import {
+  RuntimeEvent,
+  RuntimeEventTypes,
+  RuntimeMetaEventName,
+} from "../../service-adapters/events";
 import { randomId } from "@copilotkit/shared";
 
 interface LangGraphEventWithState {
@@ -123,6 +127,14 @@ export class RemoteLangGraphEventSource {
           if ("copilotkit:emit-messages" in (acc.event.metadata || {})) {
             shouldEmitMessages = acc.event.metadata["copilotkit:emit-messages"];
           }
+        }
+
+        if (acc.event.event === LangGraphEventTypes.OnInterrupt) {
+          events.push({
+            type: RuntimeEventTypes.MetaEvent,
+            name: RuntimeMetaEventName.LangGraphInterruptEvent,
+            value: acc.event.value,
+          });
         }
 
         const responseMetadata = this.getResponseMetadata(acc.event);

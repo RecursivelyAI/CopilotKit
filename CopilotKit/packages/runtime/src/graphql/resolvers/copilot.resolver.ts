@@ -14,10 +14,15 @@ import {
 } from "rxjs";
 import { GenerateCopilotResponseInput } from "../inputs/generate-copilot-response.input";
 import { CopilotResponse } from "../types/copilot-response.type";
+import { LangGraphInterruptEvent } from "../types/meta-events.type";
 import { ActionInputAvailability, MessageRole } from "../types/enums";
 import { Repeater } from "graphql-yoga";
 import type { CopilotRequestContextProperties, GraphQLContext } from "../../lib/integrations";
-import { RuntimeEvent, RuntimeEventTypes } from "../../service-adapters/events";
+import {
+  RuntimeEvent,
+  RuntimeEventTypes,
+  RuntimeMetaEventName,
+} from "../../service-adapters/events";
 import {
   FailedMessageStatus,
   MessageStatusUnion,
@@ -210,6 +215,7 @@ export class CopilotResolver {
       agentStates: data.agentStates,
       url: data.frontend.url,
       extensions: data.extensions,
+      metaEvents: data.metaEvents,
     });
 
     logger.debug("Event source created, creating response");
@@ -219,6 +225,54 @@ export class CopilotResolver {
       runId,
       status: firstValueFrom(responseStatus$),
       extensions,
+      metaEvents: new Repeater(async (push, stop) => {
+        const eventStream = eventSource.processRuntimeEvents({
+          serverSideActions,
+          guardrailsResult$: data.cloud?.guardrails ? guardrailsResult$ : null,
+          actionInputsWithoutAgents: actionInputsWithoutAgents.filter(
+            // TODO-AGENTS: do not exclude ALL server side actions
+            (action) =>
+              !serverSideActions.find((serverSideAction) => serverSideAction.name == action.name),
+          ),
+          threadId,
+        });
+        let eventStreamSubscription: Subscription;
+
+        eventStreamSubscription = eventStream.subscribe({
+          next: async (event) => {
+            if (event.type != RuntimeEventTypes.MetaEvent) {
+              return;
+            }
+            switch (event.name) {
+              case RuntimeMetaEventName.LangGraphInterruptEvent:
+                push(
+                  plainToInstance(LangGraphInterruptEvent, {
+                    type: event.type,
+                    name: event.name,
+                    value: event.value,
+                  }),
+                );
+                break;
+            }
+          },
+          error: (err) => {
+            logger.error({ err }, "Error in meta events stream");
+            responseStatus$.next(
+              new UnknownErrorResponse({
+                description: `An unknown error has occurred in the event stream`,
+              }),
+            );
+            eventStreamSubscription?.unsubscribe();
+            stop();
+          },
+          complete: async () => {
+            logger.debug("Meta events stream completed");
+            responseStatus$.next(new SuccessResponseStatus());
+            eventStreamSubscription?.unsubscribe();
+            stop();
+          },
+        });
+      }),
       messages: new Repeater(async (pushMessage, stopStreamingMessages) => {
         logger.debug("Messages repeater created");
 
@@ -301,6 +355,8 @@ export class CopilotResolver {
         eventStreamSubscription = eventStream.subscribe({
           next: async (event) => {
             switch (event.type) {
+              case RuntimeEventTypes.MetaEvent:
+                break;
               ////////////////////////////////
               // TextMessageStart
               ////////////////////////////////

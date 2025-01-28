@@ -7,6 +7,7 @@ import { ForwardedParametersInput } from "./forwarded-parameters.input";
 import { AgentSessionInput } from "./agent-session.input";
 import { AgentStateInput } from "./agent-state.input";
 import { ExtensionsInput } from "./extensions.input";
+import { MetaEventInput } from "./meta-event.input";
 
 @InputType()
 export class GenerateCopilotResponseMetadataInput {
@@ -48,4 +49,7 @@ export class GenerateCopilotResponseInput {
 
   @Field(() => ExtensionsInput, { nullable: true })
   extensions?: ExtensionsInput;
+
+  @Field(() => [MetaEventInput], { nullable: true })
+  metaEvents?: MetaEventInput[];
 }
