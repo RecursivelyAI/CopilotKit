@@ -187,9 +187,7 @@ async function streamEvents(controller: ReadableStreamDefaultController, args: E
   };
 
   if (lgInterruptEvent?.response) {
-    console.log("[INTERRUPT-DEBUG] remote-lg-action.ts:183 - Received metaEventResponse");
     payload.command = { resume: lgInterruptEvent.response };
-    console.log("Interrupt loop closed.", { command: payload.command });
   }
   const streamResponse = client.runs.stream(threadId, assistantId, payload);
 
