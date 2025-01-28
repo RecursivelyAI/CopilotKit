@@ -1,0 +1,550 @@
+---
+title: "State Machines"
+description: "Learn how to guide users through multi-step conversations using a state machine pattern."
+---
+import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
+import { Accordion } from 'fumadocs-ui/components/accordion';
+
+## Overview
+
+When building chat-based applications, you often need to guide users through a series of steps or **stages**. This recipe shows how to implement a state machine pattern to keep your assistant focused and on-track.
+
+<video src="/images/cookbook/state-machine/demo.mp4" controls autoPlay loop muted playsInline className="rounded-xl shadow-lg" />
+
+<Callout>
+This recipe assumes you have completed the [quickstart guide](/docs/quickstart) and have a basic CopilotKit application running.
+</Callout>
+
+### What is a State Machine?
+
+A state machine is a model where your application can be in exactly one state at a time, with clear rules about how to move between states. For chat applications, this means:
+
+- The assistant knows exactly what stage of the conversation it's in
+- Only certain actions are available in each stage
+- There are clear rules for moving to the next stage
+
+### State Machines in CopilotKit
+
+When implementing a state machine in CopilotKit, the main piece that enables this pattern is the `available` prop present in
+most of our hooks. This prop will allow you conditionally control what instructions, context, and actions are available to 
+the assistant.
+
+In this recipe, we combine the `available` prop with React state to control when each stage is active, sometimes through
+standard deterministic update (button clicks), and sometimes through LLM-driven actions.
+
+<ImageZoom src="/images/state-machine-arch.png" alt="State Machine Architecture" width="1000" height="500"/>
+
+## Basic Implementation
+
+<Steps>
+  <Step>
+    ### Create a stage
+
+    Each stage is composed of stage-specific instructions, context, and actions. These are enabled or disabled
+    as the stage changes via the `available` prop. In this example of a stage, we are extracting a user's name
+    and ensuring it is not in a list of other names.
+
+    ```tsx
+    import { 
+      useCopilotAdditionalInstructions, 
+      useCopilotAction, 
+      useCopilotReadable 
+    } from "@copilotkit/react-core";
+
+    // ...
+
+    /*
+     * Not required, but it is convenient to use a dedicated hook to define each 
+     * stage of the state machine
+     */
+    function useStageOne(
+      stage: string, 
+      setStage: (stage: string) => void, 
+      setName: (name: string) => void
+    ) {
+
+      /*
+       * Each stage can define its own instructions, context, and transitions
+       * (implemented via copilotActions). We transition between stages by simply
+       * setting the `stage` variable from the handler of the transition:
+       */
+
+      // Add additional instructions to the system prompt if this stage is active
+      useCopilotAdditionalInstructions({
+        instructions: "Ask for the user's name politely.",
+        // Use "available" argument to enable this only when the stage is correct! // [!code highlight:2]
+        available: stage === "one" ? "available" : "disabled"
+      })
+
+      // Add context to the system prompt if this stage is active
+      useCopilotReadable({
+        description: "Other names",
+        value: ["John", "Jane", "Jim"],
+        available: stage === "one" ? "available" : "disabled" // [!code highlight]
+      })
+
+      // Add an action to the assistant that transitions to the next stage if this stage is active
+      useCopilotAction({
+        name: "transitionToNextStage",
+        description: "Moves to the next stage, only call is the user's name is not in the list of other names",
+        available: stage === "one" ? "available" : "disabled", // [!code highlight]
+        parameters: [
+          { name: "name", type: "string", description: "The name of the user", required: true },
+        ],
+        handler: ({ name }) => {
+          // Perform any state updates given the user's input
+          setName(name);
+
+          // Transition to the next stage // [!code highlight:2]
+          setStage("two"); 
+        }
+      });
+    }
+    ```
+  </Step>
+
+  <Step>
+    ### Create another stage
+
+    Now, let's create a second stage that's simple and just greets the user by name as a pirate. This is mainly just to
+    demonstrate how to add any additional stages. The name will be made available to this stage in the next step.
+
+    ```tsx
+    import { useCopilotAdditionalInstructions } from "@copilotkit/react-core";
+
+    // ...
+
+    function useStageTwo(stage: string) => void) {
+      // Add stage-specific instructions - only available in stage "two"
+      useCopilotAdditionalInstructions({
+        instructions: "Talk to the user about their name and refer to them like a pirate would.",
+        available: stage === "two" ? "available" : "disabled"
+      })
+
+      // ...
+    }
+
+    // Any additional stages you want to add...
+    ```
+  </Step>
+
+  <Step>
+    ### Put it all together
+
+    Finally, bring everything together into a chat component:
+
+    ```tsx
+    import { useState } from "react";
+    import { CopilotKit, useCopilotReadable } from "@copilotkit/react-core";
+    import { CopilotChat } from "@copilotkit/react-ui";
+
+    // ...
+
+    function StateMachineChat() {
+      // Track the current stage and user's name
+      const [stage, setStage] = useState<string>("one");
+      const [name, setName] = useState<string>("");
+
+      // Readable context available across all stages
+      useCopilotReadable({
+        description: "User's name",
+        value: name,
+      }, [name])
+
+      // Initialize all stages with their required props
+      useStageOne(stage, setStage, setName);
+      useStageTwo(stage);
+      // any additional stages...
+
+      return (
+        <CopilotKit>
+          <CopilotChat/>
+        </CopilotKit>
+      )
+    }
+    ```
+
+    <Accordions>
+      <Accordion title="Full example code">
+        ```tsx
+        import { useState } from "react";
+        import { CopilotChat } from "@copilotkit/react-ui";
+        import { 
+          CopilotKit, 
+          useCopilotAction, 
+          useCopilotAdditionalInstructions, 
+          useCopilotReadable 
+        } from "@copilotkit/react-core";
+
+        /*
+        * Not required, but it is convenient to use a dedicated hook to define each 
+        * stage of the state machine
+        */
+        function useStageOne(
+          stage: string, 
+          setStage: (stage: string) => void, 
+          setName: (name: string) => void
+        ) {
+        
+          /*
+          * Each stage can define its own instructions, context, and transitions
+          * (implemented via copilotActions). We transition between stages by simply
+          * setting the `stage` variable from the handler of the transition:
+          */
+        
+          // Add additional instructions to the system prompt if this stage is active
+          useCopilotAdditionalInstructions({
+            instructions: "Ask for the user's name politely.",
+            // Use "available" argument to enable this only when the stage is correct!
+            available: stage === "one" ? "available" : "disabled"
+          })
+        
+          // Add context to the system prompt if this stage is active
+          useCopilotReadable({
+            description: "Other names",
+            value: ["John", "Jane", "Jim"],
+            available: stage === "one" ? "available" : "disabled"
+          })
+        
+          // Add an action to the assistant that transitions to the next stage if this stage is active
+          useCopilotAction({
+            name: "transitionToNextStage",
+            description: "Moves to the next stage, only call is the user's name is not in the list of other names",
+            available: stage === "one" ? "available" : "disabled",
+            parameters: [
+              { name: "name", type: "string", description: "The name of the user", required: true },
+            ],
+            handler: ({ name }) => {
+              // Perform any state updates given the user's input
+              setName(name);
+        
+              // Transition to the next stage
+              setStage("two"); 
+            }
+          });
+        }
+        
+        function useStageTwo(stage: string) => void) {
+          // Add stage-specific instructions - only available in stage "two"
+          useCopilotAdditionalInstructions({
+            instructions: "Talk to the user about their name and refer to them like a pirate would.",
+            available: stage === "two" ? "available" : "disabled"
+          })
+        
+          // ...
+        }
+        
+        // Any additional stages you want to add...
+
+        function StateMachineChat() {
+          const [stage, setStage] = useState<string>("one");
+          const [ name, setName ] = useState<string>("");
+
+          // Context available across all stages
+          useCopilotReadable({
+            description: "User's name",
+            value: name,
+            available: stage === "one" ? "available" : "disabled"
+          }, [name])
+
+          useStageOne(stage, setName);
+          useStageTwo(stage);
+          // any other stages you want to add ...
+
+          return (
+            <CopilotKit>
+              <CopilotChat/>
+            </CopilotKit>
+          )
+        }
+        ```
+      </Accordion>
+    </Accordions>
+  </Step>
+  <Step>
+    ### 🎉 You've implemented a state machine!
+    To recap, each stage hook uses the `available` prop to control when its instructions, context, and actions are accessible to the assistant. This ensures that the assistant only uses the correct tools and context for the current stage.
+
+    Next, let's see some advanced patterns you can implement with these fundamentals.
+  </Step>
+</Steps>
+
+## Advanced Patterns
+
+This state machine pattern can be extended for complex interactions. Below are some advanced patterns you can implement with code sourced in our 
+[car sales example](https://github.com/CopilotKit/CopilotKit/tree/main/examples/state-machine/src) which you already saw a demo of in the [overview](#overview).
+
+### Stage Transition Approaches
+
+#### Code-driven Stage Transitions
+When you want to transition between stages, you can do so by setting the `stage` deterministically, at any point in code.
+
+
+```tsx
+const [stage, setStage] = useState<string>("one");
+
+// ...
+
+<button onClick={() => setStage("two")}>
+  Transition to next stage
+</button>
+```
+
+The car sales demo uses this approach in generative UI (for more on generative UI, see the [section below](#generative-ui)) to transition between stages 
+when a user submits their contact information.
+
+Click here for the [source code](https://github.com/CopilotKit/CopilotKit/tree/main/examples/state-machine/src/lib/stages/use-stage-get-contact-info.tsx)
+
+```tsx title="src/lib/stages/use-stage-get-contact-info.tsx"
+// imports ...
+
+export function useStageGetContactInfo() {
+  const { setContactInfo, stage, setStage } = useGlobalState();
+
+  // ...
+
+  // Render the ContactInfo component and wait for the user's response.
+  useCopilotAction(
+    {
+      name: "getContactInformation",
+      description: "Get the contact information of the user",
+      available: stage === "getContactInfo" ? "enabled" : "disabled",
+      renderAndWaitForResponse: ({ status, respond }) => {
+        return (
+          <ContactInfo
+            status={status}
+            // [!code highlight:11]
+            onSubmit={(name, email, phone) => {
+              // Commit the contact information to the global state.
+              setContactInfo({ name, email, phone });
+
+              // Let the agent know that the user has submitted their contact information.
+              respond?.("User has submitted their contact information.");
+
+              // This move the state machine to the next stage, buildCar deterministically.
+              setStage("buildCar");
+            }}
+          />
+        );
+      },
+    },
+    [stage],
+  );
+}
+
+```
+
+#### LLM-Driven Stage Transitions
+
+Sometimes you need stages that can transition to different next stages based on user input or LLM-driven actions.
+
+Click here for the [source code](https://github.com/CopilotKit/CopilotKit/tree/main/examples/state-machine/src/lib/stages/use-stage-sell-financing.tsx)
+
+```tsx title="src/lib/stages/use-stage-sell-financing.tsx"
+function useStageSellFinancing() {
+  const { stage, setStage } = useGlobalState();
+  const isActive = stage === "sellFinancing";
+
+  // Provide context to the AI
+  useCopilotReadable({
+    description: "Financing Information",
+    value: "Current promotion: 0% financing for 60 months...",
+    available: isActive ? "enabled" : "disabled"
+  });
+
+  // Different paths based on financing choice by user, LLM will decide which path to take
+  // [!code highlight:14]
+  useCopilotAction({
+    name: "selectFinancing",
+    description: "Select the financing option",
+    available: stage === "sellFinancing" ? "enabled" : "disabled",
+    handler: () => setStage("getFinancingInfo"),
+  }, [stage]);
+ 
+  useCopilotAction({
+    name: "selectNoFinancing",
+    description: "Select the no financing option",
+    available: stage === "sellFinancing" ? "enabled" : "disabled",
+    handler: () => setStage("getPaymentInfo"),
+  }, [stage]);
+
+}
+```
+
+### Generative UI
+[Generative UI](/guides/generative-ui) is a pattern where tool calls are streamed and rendered for the user to visualize the progress an agent is making. It can also be combined with the **Human-in-the-loop pattern** to allow checkpoints where the user can intervene and help guide the agent.
+
+When combined with the state machine pattern, you can build deep and interactive conversations with the user. For example, the `buildCar` stage in the car sales demo 
+uses generative UI to show the user available cars that they can choose from.
+
+Click here for the [source code](https://github.com/CopilotKit/CopilotKit/tree/main/examples/state-machine/src/lib/stages/use-stage-build-car.tsx)
+
+<video src="/images/cookbook/state-machine/gen-ui.mp4" controls autoPlay loop muted playsInline className="rounded-xl shadow-lg" />
+
+<Tabs items={["Build Car Stage", "Show Car Component"]}>
+  <Tab value="Build Car Stage">
+    ```tsx title="src/lib/stages/use-stage-build-car.tsx"
+    export function useStageBuildCar() {
+      const { setSelectedCar, stage, setStage } = useGlobalState();
+
+      // ...
+
+      useCopilotAction({
+        name: "showCar",
+        description: "Show a single car that you have in mind. Do not call this more than once, call `showMultipleCars` if you have multiple cars to show.",
+        available: stage === "buildCar" ? "enabled" : "disabled", // [!code highlight]
+        parameters: [
+          // excluded for brevity, see source code link above for more detail
+        ],
+        renderAndWaitForResponse: ({ args, status, respond }) => {
+          const { car } = args;
+          return (
+            // [!code highlight:11]
+            <ShowCar
+              car={(car as Car) || ({} as Car)}
+              status={status}
+              onSelect={() => {
+                setSelectedCar((car as Car) || ({} as Car));
+                respond?.("User has selected a car you can see it in your readables, the system will now move to the next state, do not call call nextState.");
+                setStage("sellFinancing");
+              }}
+              onReject={() => respond?.("User wants to select a different car, please stay in this state and help them select a different car")}
+            />
+          );
+        },
+      }, [stage]);
+      // ...
+    }
+    ```
+  </Tab>
+  <Tab value="Show Car Component">
+    ```tsx title="src/components/generative-ui/show-car.tsx"
+    export function ShowCar({ car, onSelect, onReject, status, className }: ShowCarProps) {
+      const carDetails = [
+        { label: "Make", value: car.make },
+        { label: "Model", value: car.model },
+        { label: "Year", value: car.year },
+        { label: "Color", value: <ColorDisplay color={car.color} /> },
+        { label: "Price", value: `$${car.price?.toLocaleString()}`, bold: true },
+      ];
+
+      const cardStyles = cn("min-w-[300px] max-w-sm bg-white rounded-xl overflow-hidden p-0 gap-0", className);
+      const informationWrapperStyles = "space-y-6 pt-4 pb-4";
+      const acceptButtonStyles = "flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md";
+      const rejectButtonStyles = "flex-1 bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-all duration-200";
+
+      return (
+        <AnimatedCard status={status} className={cardStyles}>
+          <CarImage car={car} />
+
+          <div className={informationWrapperStyles}>
+            <div className="space-y-2 px-6">
+              <div className="text-2xl font-semibold text-gray-900">
+                {car.year} {car.make} {car.model}
+              </div>
+              {carDetails.map(({ label, value, bold }) => (
+                <div key={label} className="flex justify-between items-center py-1">
+                  <span className="text-gray-500 text-sm">{label}</span>
+                  <span className={cn("text-gray-900", bold ? "font-semibold text-lg" : "text-sm")}>
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className={cn("px-6 pt-2", status === "complete" ? "hidden" : "animate-fade-in")}>
+              <hr className="mb-4 border-gray-100" />
+              <div className="flex gap-3">
+                {onReject && (
+                  <button className={rejectButtonStyles} onClick={onReject}>
+                    Other options
+                  </button>
+                )}
+                <button className={acceptButtonStyles} onClick={onSelect}>
+                  Select
+                </button>
+              </div>
+            </div>
+          </div>
+        </AnimatedCard>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Initial message loading
+To add an initial message to the chat, we can use the `appendMessage` function provided by the `useCopilotChat` hook.
+
+<Callout title="Improved experience coming soon">
+  This is a temporary solution and we will be improving this in the near future.
+</Callout>
+
+Click here for the [source code](https://github.com/CopilotKit/CopilotKit/tree/main/examples/state-machine/src/components/car-sales-chat.tsx)
+
+```tsx title="src/components/car-sales-chat.tsx"
+import { useCopilotChat } from "@copilotkit/react-core";
+
+// ...
+
+const { appendMessage, isLoading } = useCopilotChat();
+
+// Render an initial message when the chat is first loaded
+useEffect(() => {
+  if (initialMessageSent || isLoading) return;
+
+  setTimeout(() => {
+    appendMessage(
+      new TextMessage({
+        content:
+          "Hi, I'm Fio, your AI car salesman. First, let's get your contact information before we get started.",
+        role: MessageRole.Assistant,
+      }),
+    );
+    setInitialMessageSent(true);
+  }, 500);
+}, [initialMessageSent, appendMessage, isLoading]);
+
+// ...
+
+```
+
+### Tools When Entering a Stage
+
+Sometimes you'll want to guide the AI to call a specific tool when entering a stage. 
+
+The payment info stage demonstrates how to guide the AI to make specific tool calls by 
+adding additional instructions to call the `getPaymentInformation` tool explicitly.
+
+Click here for the [source code](https://github.com/CopilotKit/CopilotKit/tree/main/examples/state-machine/src/lib/stages/use-stage-get-payment-info.tsx)
+
+```tsx title="src/lib/stages/use-stage-get-payment-info.tsx"
+export function useStageGetPaymentInfo() {
+  const { setCardInfo, stage, setStage } = useGlobalState();
+
+  // Conditionally add additional instructions for the agent's prompt.
+  useCopilotAdditionalInstructions({
+    available: stage === "getPaymentInfo" ? "enabled" : "disabled",
+    // [!code highlight:6]
+    instructions: `
+        CURRENT STATE: You are now getting the payment information of the user. 
+        Say, 'Great! Now I need to get your payment information.' and MAKE SURE 
+        to then call the 'getPaymentInformation' action.
+    `,
+  }, [stage]);
+
+  // ...
+
+}
+```
+
+## Recap
+
+This recipe introduced a powerful pattern for building conversational AI applications using state machines. By breaking down complex interactions into discrete stages, each with
+focused instructions and actions, we can create more maintainable and user-friendly experiences. 
+
+With this pattern, you can start building your own multi-stage conversations. 
+
+## Need Help?
+
+Need help or want to share what you've built? Join our [Discord community](https://discord.gg/6dffbvGU3D) or open an issue on [GitHub](https://github.com/CopilotKit/CopilotKit/issues/new/choose).

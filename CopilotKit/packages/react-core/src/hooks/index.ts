@@ -10,3 +10,4 @@ export { useCopilotReadable } from "./use-copilot-readable";
 export { useCoAgent, type HintFunction, runAgent, startAgent, stopAgent } from "./use-coagent";
 export { useCopilotRuntimeClient } from "./use-copilot-runtime-client";
 export { useCopilotAuthenticatedAction_c } from "./use-copilot-authenticated-action";
+export { useCopilotAdditionalInstructions } from "./use-copilot-additional-instructions";

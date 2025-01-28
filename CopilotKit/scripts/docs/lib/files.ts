@@ -121,6 +121,13 @@ export const REFERENCE_DOCS: ReferenceDocConfiguration[] = [
     description:
       "The useCoAgent hook allows you to share state bidirectionally between your application and the agent.",
   },
+  {
+    sourcePath: "packages/react-core/src/hooks/use-copilot-additional-instructions.ts",
+    destinationPath: "docs/content/docs/reference/hooks/useCopilotAdditionalInstructions.mdx",
+    hook: "useCopilotAdditionalInstructions",
+    description:
+      "The useCopilotAdditionalInstructions hook allows you to provide additional instructions to the agent.",
+  },
   /* SDKs */
   {
     sourcePath: "../sdk-python/copilotkit/langgraph.py",

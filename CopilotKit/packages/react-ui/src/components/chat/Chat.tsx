@@ -60,7 +60,6 @@ import { RenderResultMessage as DefaultRenderResultMessage } from "./messages/Re
 import { RenderAgentStateMessage as DefaultRenderAgentStateMessage } from "./messages/RenderAgentStateMessage";
 import { AssistantMessage as DefaultAssistantMessage } from "./messages/AssistantMessage";
 import { UserMessage as DefaultUserMessage } from "./messages/UserMessage";
-import { Markdown as DefaultRenderer } from "./Markdown";
 import { Suggestion } from "./Suggestion";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -268,11 +267,32 @@ export function CopilotChat({
   AssistantMessage = DefaultAssistantMessage,
   UserMessage = DefaultUserMessage,
 }: CopilotChatProps) {
-  const context = useCopilotContext();
+  const { additionalInstructions, setChatInstructions } = useCopilotContext();
 
   useEffect(() => {
-    context.setChatInstructions(instructions || "");
-  }, [instructions]);
+    if (!additionalInstructions?.length) {
+      setChatInstructions(instructions || "");
+      return;
+    }
+
+    /*
+      Will result in a prompt like:
+
+      You are a helpful assistant. 
+      Additionally, follow these instructions:
+      - Do not answer questions about the weather.
+      - Do not answer questions about the stock market."
+    */
+    const combinedAdditionalInstructions = [
+      instructions,
+      "Additionally, follow these instructions:",
+      ...additionalInstructions.map((instruction) => `- ${instruction}`),
+    ];
+
+    console.log("combinedAdditionalInstructions", combinedAdditionalInstructions);
+
+    setChatInstructions(combinedAdditionalInstructions.join("\n") || "");
+  }, [instructions, additionalInstructions]);
 
   const {
     visibleMessages,

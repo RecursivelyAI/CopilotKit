@@ -1,0 +1,66 @@
+---
+title: "useCopilotAdditionalInstructions"
+description: "The useCopilotAdditionalInstructions hook allows you to provide additional instructions to the agent."
+---
+
+{
+ /*
+  * ATTENTION! DO NOT MODIFY THIS FILE!
+  * This page is auto-generated. If you want to make any changes to this page, changes must be made at:
+  * CopilotKit/packages/react-core/src/hooks/use-copilot-additional-instructions.ts
+  */
+}
+`useCopilotAdditionalInstructions` is a React hook that provides additional instructions
+to the Copilot.
+ 
+## Usage
+ 
+### Simple Usage
+ 
+In its most basic usage, useCopilotAdditionalInstructions accepts a single string argument
+representing the instructions to be added to the Copilot.
+ 
+```tsx
+import { useCopilotAdditionalInstructions } from "@copilotkit/react-core";
+ 
+export function MyComponent() {
+  useCopilotAdditionalInstructions({
+    instructions: "Do not answer questions about the weather.",
+  });
+}
+```
+ 
+### Conditional Usage
+ 
+You can also conditionally add instructions based on the state of your app.
+ 
+```tsx
+import { useCopilotAdditionalInstructions } from "@copilotkit/react-core";
+ 
+export function MyComponent() {
+  const [showInstructions, setShowInstructions] = useState(false);
+ 
+  useCopilotAdditionalInstructions({
+    available: showInstructions ? "enabled" : "disabled",
+    instructions: "Do not answer questions about the weather.",
+  });
+}
+```
+
+## Parameters
+
+<PropertyReference name="instructions" type="string" required > 
+The instructions to be added to the Copilot. Will be added to the instructions like so:
+ 
+  ```txt
+  You are a helpful assistant.
+  Additionally, follow these instructions:
+  - Do not answer questions about the weather.
+  - Do not answer questions about the stock market.
+  ```
+</PropertyReference>
+
+<PropertyReference name="available" type="'enabled' | 'disabled'"  > 
+Whether the instructions are available to the Copilot.
+</PropertyReference>
+
