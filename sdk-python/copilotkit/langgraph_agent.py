@@ -411,11 +411,24 @@ class _StreamingStateExtractor:
         self.emit_intermediate_state = emit_intermediate_state
         self.tool_call_buffer = {}
         self.current_tool_call = None
-
+        self.content_buffer = ""
         self.previously_parsable_state = {}
 
     def buffer_tool_calls(self, event: Any):
-        """Buffer the tool calls"""
+        """Buffer the tool calls and content"""
+        # Check if any config is set for direct output
+        has_direct_output = any(
+            config.get("direct_output", False) 
+            for config in self.emit_intermediate_state
+        )
+
+        # Only handle direct content if we have a direct output config
+        if has_direct_output and "chunk" in event["data"]:
+            chunk = event["data"]["chunk"]
+            if hasattr(chunk, "content") and chunk.content:
+                self.content_buffer += chunk.content
+
+        # Handle tool call streaming
         if len(event["data"]["chunk"].tool_call_chunks) > 0:
             chunk = event["data"]["chunk"].tool_call_chunks[0]
             if chunk["name"] is not None:
@@ -428,26 +441,28 @@ class _StreamingStateExtractor:
 
     def get_emit_state_config(self, current_tool_name):
         """Get the emit state config"""
-
         for config in self.emit_intermediate_state:
             state_key = config.get("state_key")
             tool = config.get("tool")
             tool_argument = config.get("tool_argument")
+            direct_output = config.get("direct_output", False)
 
+            if direct_output:
+                return (None, state_key, True)
+            
             if current_tool_name == tool:
-                return (tool_argument, state_key)
+                return (tool_argument, state_key, False)
 
-        return (None, None)
-
+        return (None, None, False)
 
     def extract_state(self):
         """Extract the streaming state"""
         parser = JSONParser()
-
         state = {}
 
+        # Process tool calls
         for key, value in self.tool_call_buffer.items():
-            argument_name, state_key = self.get_emit_state_config(key)
+            argument_name, state_key, _ = self.get_emit_state_config(key)
 
             if state_key is None:
                 continue
@@ -466,5 +481,12 @@ class _StreamingStateExtractor:
                 state[state_key] = parsed_value
             else:
                 state[state_key] = parsed_value.get(argument_name)
+
+        # Process direct content
+        if self.content_buffer:
+            for config in self.emit_intermediate_state:
+                _, state_key, direct_output = self.get_emit_state_config("")
+                if direct_output and state_key:
+                    state[state_key] = self.content_buffer
 
         return state
