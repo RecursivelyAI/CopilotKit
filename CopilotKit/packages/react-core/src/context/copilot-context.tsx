@@ -144,6 +144,9 @@ export interface CopilotContextParams {
   chatInstructions: string;
   setChatInstructions: React.Dispatch<React.SetStateAction<string>>;
 
+  additionalInstructions?: string[];
+  setAdditionalInstructions: React.Dispatch<React.SetStateAction<string[]>>;
+
   // api endpoints
   copilotApiConfig: CopilotApiConfig;
 
@@ -224,6 +227,9 @@ const emptyCopilotContext: CopilotContextParams = {
 
   chatInstructions: "",
   setChatInstructions: () => returnAndThrowInDebug(""),
+
+  additionalInstructions: [],
+  setAdditionalInstructions: () => returnAndThrowInDebug([]),
 
   getDocumentsContext: (categories: string[]) => returnAndThrowInDebug([]),
   addDocumentContext: () => returnAndThrowInDebug(""),

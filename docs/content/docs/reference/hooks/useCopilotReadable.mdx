@@ -91,6 +91,10 @@ An array of categories to control which context are visible where. Particularly 
   with CopilotTextarea (see `useMakeAutosuggestionFunction`)
 </PropertyReference>
 
+<PropertyReference name="available" type="'enabled' | 'disabled'"  > 
+Whether the context is available to the Copilot.
+</PropertyReference>
+
 <PropertyReference name="convert" type="(description: string, value: any) => string"  > 
 A custom conversion function to use to serialize the value to a string. If not provided, the value
   will be serialized using `JSON.stringify`.
