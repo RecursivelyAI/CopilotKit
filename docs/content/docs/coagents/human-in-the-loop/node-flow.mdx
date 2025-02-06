@@ -1,0 +1,180 @@
+---
+title: Node-based
+description: Learn how to implement Human-in-the-Loop (HITL) using a node-based flow.
+icon: lucide/Share2
+---
+import RunAndConnectAgentSnippet from "@/snippets/coagents/run-and-connect-agent.mdx"
+
+<video src="/images/coagents/node-hitl.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+
+<Callout type="info">
+  Pictured above is the [coagent starter](https://github.com/copilotkit/copilotkit/tree/main/examples/coagent-starter) with
+  the implementation below applied!
+</Callout>
+
+## What is this?
+
+In LangGraph, there are two main ways to implement Human-in-the-Loop (HITL): Node-based and Interrupt-based. This guide
+shows how to implement HITL using a node-based flow.
+
+Node based flows are predicated on the idea of nodes awaiting user input prior to their execution. This is done through
+LangGraph's `interrupt_before` and `interrupt_after` properties of the agent's `compile` method.
+
+CopilotKit allows you to add custom UI to take user input and then pass it back to the agent upon completion.
+
+## Why should I use this?
+
+Human-in-the-loop is a powerful way to implement complex workflows that are production ready. By having a human in the loop,
+you can ensure that the agent is always making the right decisions and ultimately is being steered in the right direction.
+
+Node-based flows are a great way to implement HITL for more complex workflows where you want to ensure the agent is aware
+of everything that has happened during a HITL interaction. This is contrasted with interrupt-based flows, where the agent
+is interrupted and then resumes execution from where it left off, unaware of the context of the interaction by default.
+
+## Implementation
+
+<Steps>
+    <Step>
+        ### Run and connect your agent
+        <RunAndConnectAgentSnippet />
+    </Step>
+
+    <Step>
+        ### Add a `useCopilotAction` to your Frontend
+        First, we'll create a component that renders the agent's essay draft and waits for user approval.
+
+        ```tsx title="ui/app/page.tsx"
+        import { useCopilotAction, Markdown } from "@copilotkit/react-core"
+
+        function YourMainContent() {
+          // ...
+
+          useCopilotAction({ 
+            name: "writeEssay",
+            available: "remote",
+            description: "Writes an essay and takes the draft as an argument.",
+            parameters: [
+              { name: "draft", type: "string", description: "The draft of the essay", required: true },
+            ],
+            // [!code highlight:25]
+            renderAndWaitForResponse: ({ args, respond, status }) => {
+              return (
+                <div>
+                  <Markdown content={args.draft || 'Preparing your draft...'} />
+                  
+                  <div className={`flex gap-4 pt-4 ${status !== "executing" ? "hidden" : ""}`}>
+                    <button 
+                      onClick={() => respond?.("CANCEL")}
+                      disabled={status !== "executing"}
+                      className="border p-2 rounded-xl w-full"
+                    >
+                      Try Again
+                    </button>
+                    <button
+                      onClick={() => respond?.("SEND")}
+                      disabled={status !== "executing"} 
+                      className="bg-blue-500 text-white p-2 rounded-xl w-full"
+                    >
+                      Approve Draft
+                    </button>
+                  </div>
+                </div>
+              );
+            },
+          });
+
+          // ...
+        }
+        ```
+    </Step>
+
+    <Step>
+    ### Setup the LangGraph Agent
+    Now we'll setup the LangGraph agent. Node-based flows are hard to understand without a complete example, so below
+    is the complete implementation of the agent with explanations.
+
+    Some main things to note:
+    - The agent's state inherits from `CopilotKitState` to bring in the CopilotKit actions.
+    - CopilotKit's actions are binded to the model as tools.
+    - If the `writeEssay` action is found in the model's response, the agent will transition to the `user_feedback_node`.
+    - The agent is interrupted before the `user_feedback_node` to allow for user input.
+
+    ```python title="agent/sample_agent/agent.py"
+    from typing_extensions import Literal
+    from langchain_openai import ChatOpenAI
+    from langchain_core.messages import SystemMessage, AIMessage
+    from langchain_core.runnables import RunnableConfig
+    from langgraph.graph import StateGraph, END
+    from langgraph.checkpoint.memory import MemorySaver
+    from langgraph.types import Command
+    from copilotkit import CopilotKitState
+
+    # 1. Define our agent's state and inherit from CopilotKitState, this brings in the CopilotKit actions
+    class AgentState(CopilotKitState): # [!code highlight]
+        # 1.1 Define any other state variables
+        pass
+
+    # 2. Define the chat node, this will be where the agent will talk to user and
+    #    decide if it needs to call the writeEssay tool
+    async def chat_node(state: AgentState, config: RunnableConfig) -> Command[Literal["user_feedback_node", "__end__"]]:
+        # 2.1 Define the model and bind CopilotKit's actions as tools
+        model = ChatOpenAI(model="gpt-4o")
+        model_with_tools = model.bind_tools([*state.get("copilotkit", {}).get("actions", [])]) # [!code highlight]
+
+        # 2.2 Define the system message
+        system_message = SystemMessage(
+            content="You write essays. Use your tools to write an essay, don't just write it in plain text."
+        )
+
+        # 2.3 Run the model to generate a response
+        response = await model_with_tools.ainvoke([
+            system_message,
+            *state["messages"],
+        ], config)
+
+        # [!code highlight:6]
+        # 2.4 Check for the writeEssay tool call and, if found, go  to the
+        #     user_feedback_node to handle the user's response
+        if isinstance(response, AIMessage) and response.tool_calls:
+            if response.tool_calls[0].get("name") == "writeEssay":
+                return Command(goto="user_feedback_node", update={"messages": response})
+
+        # 2.5 If no tool call is found, end the agent
+        return Command(goto=END, update={"messages": response})
+
+    # 3. Define the user_feedback_node, this node will be interrupted before execution
+    #    where CopilotKit's renderAndWaitForResponse provide the user's response.
+    def user_feedback_node(state: AgentState, config: RunnableConfig) -> Command[Literal["chat_node"]]:
+        # [!code highlight:4]
+        # 3.1 Get the last message from the state, this will be 
+        #     what is returned by respond() in the frontend
+        last_message = state["messages"][-1]
+
+        # 3.2 If the user declined the essay, ask them how they'd like to improve it
+        if last_message.content != "SEND":
+            return Command(goto="chat_node", update={
+                "messages": [SystemMessage(content="The user declined they essay, please ask them how they'd like to improve it")]
+            })
+
+        # 3.3 If the user approved the essay, ask them if they'd like anything else
+        return Command(goto="chat_node", update={
+            "messages": [SystemMessage(content="The user approved the essay, ask them if they'd like anything else")]
+        })
+
+    # 4. Configure the workflow
+    workflow = StateGraph(AgentState)
+    workflow.add_node("chat_node", chat_node)
+    workflow.add_node("user_feedback_node", user_feedback_node)
+    workflow.set_entry_point("chat_node")
+
+    # [!code highlight:3]
+    # 5. Compile the workflow and set the interrupt_before property
+    graph = workflow.compile(MemorySaver(), interrupt_before=["user_feedback_node"])
+    ```
+    </Step>
+    <Step>
+        ### Give it a try!
+        Try asking your agent to write an essay about the benefits of AI. You'll see that it will generate an essay,
+        stream the progress and eventually ask you to review it.
+    </Step>
+</Steps>

@@ -1,0 +1,52 @@
+---
+title: Generative UI
+icon: "lucide/Paintbrush"
+description: Render your agent's behavior with custom UI components.
+---
+import {CTACards} from "@/components/react/cta-cards"
+import { WrenchIcon, BotIcon } from "lucide-react"
+
+<Frame>
+  <img 
+    src="/images/coagents/AgenticGenerativeUI.gif" 
+    className="my-0" 
+    alt="Demo of Generative UI showing a meeting scheduling agent"
+  />
+</Frame>
+
+<Callout>
+    This example shows our [Research Canvas](/coagents/videos/research-canvas) making use of Generative UI!
+</Callout>
+
+## What is Generative UI?
+
+Generative UI lets you render your agent's state, progress, outputs, and tool calls with custom UI components in real-time. It bridges the gap between AI
+agents and user interfaces. As your agent processes information and makes decisions, you can render custom UI components that:
+
+- Show loading states and progress indicators
+- Display structured data in tables, cards, or charts
+- Create interactive elements for user input
+- Animate transitions between different states
+
+## How can I use this?
+
+There are two main variants of Generative UI.
+
+<CTACards
+  columns={2}
+  cards={[
+    {
+      icon: BotIcon,
+      title: "Agentic",
+      description: "Render your agent's state, progress, and outputs with custom UI components.",
+      href: "/coagents/generative-ui/agentic"
+    },
+    {
+      icon: WrenchIcon,
+      title: "Tool-based",
+      description: "Render your agent's tool calls with custom UI components.",
+      href: "/coagents/generative-ui/tool-based"
+    },
+  ]}
+/>
+

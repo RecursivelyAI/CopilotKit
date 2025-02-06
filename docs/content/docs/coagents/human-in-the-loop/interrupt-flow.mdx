@@ -1,0 +1,98 @@
+---
+title: Interrupt
+icon: "lucide/CirclePause"
+description: Learn how to implement Human-in-the-Loop (HITL) using a interrupt-based flow.
+---
+import InstallSDKSnippet from "@/snippets/install-sdk.mdx"
+import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
+import RunAndConnectAgentSnippet from "@/snippets/coagents/run-and-connect-agent.mdx"
+
+<video src="/images/coagents/interrupt-flow.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+
+## What is this?
+
+[LangGraph's interrupt flow](https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/) provides an intuitive way to implement Human-in-the-loop workflows.
+
+This guide will show you how to both use `interrupt` and how to integrate it with CopilotKit.
+
+## When should I use this?
+
+This flow is useful when you want to interrupt the agent's flow to get user input.
+
+## Implementation
+
+<Steps>
+<Step>
+### Run and connect your agent
+<RunAndConnectAgentSnippet />
+</Step>
+<Step>
+### Call `interrupt` in your LangGraph agent
+
+<Tabs items={['Python', 'TypeScript']} default="Python">
+    <Tab value="Python">
+        ```python title="agent/sample_agent/agent.py"
+        from langgraph.types import interrupt # [!code highlight]
+
+        # ...
+
+        def chat_node(state: AgentState, config: RunnableConfig):
+            agent_name = state.get("agent_name")
+            if not agent_name:
+                # Interrupt and wait for the user to respond with a name
+                agent_name = interrupt(f"Before we start, what would you like to call me?") # [!code highlight]
+
+                # Go back to the chat node and update the state with the name
+                return Command(goto="chat_node", update={"agent_name": agent_name})
+
+            # Tell the agent its name
+            system_message = SystemMessage(
+                content=f"You are a helpful assistant named {agent_name}..."
+            )
+
+            # ...
+        ```
+    </Tab>
+</Tabs>
+</Step>
+<Step>
+### Handle the interrupt in your frontend
+At this point, your LangGraph agent's `interrupt` will be called. However, we currently have no handling for rendering or 
+responding to the interrupt in the frontend.
+
+To do this, we'll use the `useLangGraphInterrupt` hook, give it a component to render, and then call `resolve` with the user's response.
+
+```tsx title="app/page.tsx"
+import { useLangGraphInterrupt } from "@copilotkit/react-core"; // [!code highlight]
+// ...
+
+const YourMainContent = () => {
+  // ...
+  // [!code highlight:15]
+  // styles omitted for brevity
+  useLangGraphInterrupt({
+    render: ({ event, resolve }) => (
+      <div>
+        <p>{event.value}</p>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          resolve((e.target as HTMLFormElement).response.value);
+        }}>
+          <input type="text" name="response" placeholder="Enter your response" />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    )
+  });
+  // ...
+
+  return <div>{/* ... */}</div>
+}
+```
+
+</Step>
+<Step>
+### Give it a try!
+Try talking to your agent, you'll see that it now pauses execution and waits for you to respond!
+</Step>
+</Steps>

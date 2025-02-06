@@ -1,38 +1,15 @@
-Here are various ways to deploy your `LangGraph` agent.
+<Tabs groupId="lg-deployment-type" items={['Local Development', 'Self hosted', 'Platform (cloud)']}>
+  <Tab value="Local Development">
+    For local development, you can [use the LangGraph CLI](https://langchain-ai.github.io/langgraph/cloud/reference/cli/) to start a 
+    development server and LangGraph studio session.
 
-<Tabs groupId="lg-deployment-type" items={['Studio (local development)', 'CLI (local development)', 'CLI (self hosted)', 'Platform (cloud)']}>
-  <Tab value="Studio (local development)">
-    For local deployment during development, you can [use LangGraph Studio](https://langchain-ai.github.io/langgraph/cloud/how-tos/test_local_deployment/).
-    <Callout type="info">
-      To ensure a successful deployment, follow these steps from the LangGraph Studio documentation:
-      1. Make sure your agent folder contains a `langgraph.json` file.
-      2. In the `langgraph.json` file, reference the path to a `.env` file.
-      3. In the `.env` file, include your `LANGSMITH_API_KEY`.
-    </Callout>
-
-    A successful deployment will yield an API URL (often referred to here as "deployment URL").
-    It will generally look like this: `http://localhost:63899`.
-
-    Come back with that URL and a LangSmith API key before proceeding.
-
-    <img src="/images/langgraph-studio-local-url.png" alt="LangGraph Studio Local URL" className="my-4" />
-
+    ```bash
+    langgraph dev --host localhost --port 8000
+    # our deployment URL will be http://localhost:8000
+    ```
   </Tab>
 
-  <Tab value="CLI (local development)">
-    For local development, you can use the LangGraph CLI to deploy your LangGraph agent.
-    To ensure a successful deployment, follow these steps from the LangGraph CLI documentation:
-      1. Make sure your agent folder contains a `langgraph.json` file.
-      2. In the `langgraph.json` file, reference the path to a `.env` file.
-      3. In the `.env` file, include your `LANGSMITH_API_KEY`.
-      4. Install the LangGraph CLI: `pip install "langgraph-cli[inmem]>=0.1.55"`
-      5. Run agent locally: `langgraph up --port <port> --host 0.0.0.0 --no-browser`
-    <Callout type="warn">
-      If you are using LangGraph.js, at the moment, you can only run the agent locally using `langgraph up`. LangGraph.js does not support running the agent using development server (`langgraph dev`).
-    </Callout>
-  </Tab>
-
-  <Tab value="CLI (self hosted)">
+  <Tab value="Self hosted">
     For self-hosting a LangGraph.js agent, follow these steps:
 
     1. Set up your project structure:

@@ -1,5 +1,6 @@
 {
   "title": "Customize Look & Feel",
+  "icon": "lucide/Paintbrush",
   "pages": [
     "built-in-ui-components",
     "customize-built-in-ui-components",

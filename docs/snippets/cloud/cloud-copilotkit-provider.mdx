@@ -4,15 +4,15 @@ import { ReactNode } from "react";
 import { CopilotKit } from "@copilotkit/react-core"; // [!code highlight]
  
 export default function RootLayout({ children }: { children: ReactNode }) {
-    return (
-      <html lang="en">
-        <body>
-          {/* Use the public api key you got from Copilot Cloud  */} // [!code highlight:4]
-          <CopilotKit publicApiKey="<your-copilot-cloud-public-api-key>"> 
-            {children}
-          </CopilotKit>
-        </body>
-      </html>
-    );
+  return (
+    <html lang="en">
+      <body>
+        {/* Use the public api key you got from Copilot Cloud  */} // [!code highlight:4]
+        <CopilotKit publicApiKey="<your-copilot-cloud-public-api-key>"> 
+          {children}
+        </CopilotKit>
+      </body>
+    </html>
+  );
 }
 ```

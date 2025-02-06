@@ -1,13 +1,11 @@
 import { NextRequest } from "next/server";
 import {
   CopilotRuntime,
-  OpenAIAdapter,
   copilotRuntimeNextJSAppRouterEndpoint,
+  ExperimentalEmptyAdapter
 } from "@copilotkit/runtime";
-import OpenAI from "openai";
 
-const openai = new OpenAI();
-const serviceAdapter = new OpenAIAdapter({ openai });
+const serviceAdapter = new ExperimentalEmptyAdapter();
 
 const runtime = new CopilotRuntime({
   remoteEndpoints: [

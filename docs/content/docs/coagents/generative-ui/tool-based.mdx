@@ -1,0 +1,103 @@
+---
+title: Tool-based Generative UI
+icon: "lucide/Wrench"
+description: Render your agent's tool calls with custom UI components.
+---
+import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
+import RunAndConnectAgentSnippet from "@/snippets/coagents/run-and-connect-agent.mdx"
+
+<video src="/images/coagents/tool-based-gen-ui.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+<Callout>
+  This video demonstrates the [implementation](#implementation) section applied to out [coagents starter project](https://github.com/copilotkit/coagents-starter).
+</Callout>
+
+## What is this?
+
+Tools are a way for the LLM to call predefined, typically, deterministic functions. CopilotKit allows you to render these tools in the UI
+as a custom component, which we call **Generative UI**.
+
+## When should I use this?
+
+Rendering tools in the UI is useful when you want to provide the user with feedback about what your agent is doing, specifically
+when your agent is calling tools. CopilotKit allows you to fully customize how these tools are rendered in the chat.
+
+## Implementation
+
+<Steps>
+<Step>
+### Run and connect your agent
+<RunAndConnectAgentSnippet />
+</Step>
+<Step>
+### Give your agent a tool to call
+
+<Tabs items={['Python', 'TypeScript']} default="Python">
+    <Tab value="Python">
+        ```python title="agent/sample_agent/agent.py"
+        from langchain_openai import ChatOpenAI
+        from langchain.tools import tool
+        # ...
+
+        # [!code highlight:7]
+        @tool
+        def get_weather(location: str):
+            """
+            Get the weather for a given location.
+            """
+            return f"The weather for {location} is 70 degrees."
+
+        # ...
+
+        def chat_node(state: AgentState, config: RunnableConfig):
+            model = ChatOpenAI(model="gpt-4o")
+            model_with_tools = model.bind_tools([get_weather]) # [!code highlight]
+
+            response = await model_with_tools.ainvoke([
+                SystemMessage(content=f"You are a helpful assistant.")
+                *state["messages"],
+            ], config)
+
+            # ...
+        ```
+    </Tab>
+</Tabs>
+</Step>
+<Step>
+### Render the tool call in your frontend
+At this point, your agent will be able to call the `get_weather` tool. Now 
+we just need to add a `useCopilotAction` hook to render the tool call in
+the UI.
+
+```tsx title="app/page.tsx"
+import { useLangGraphInterrupt } from "@copilotkit/react-core"; // [!code highlight]
+// ...
+
+const YourMainContent = () => {
+  // ...
+  // [!code highlight:13]
+  useCopilotAction({
+    name: "get_weather",
+    // Don't allow the agent or UI to call this tool, its only for rendering
+    available: "disabled",
+    render: ({status, args}) => {
+      return (
+        <p className="text-gray-500 mt-2">
+          {status !== "complete" && "Calling weather API..."}
+          {status === "complete" && `Called the weather API for ${args.location}.`}
+        </p>
+      );
+    },
+  });
+  // ...
+}
+```
+
+</Step>
+<Step>
+### Give it a try!
+
+Try asking the agent to get the weather for a location. You should see the custom UI component that we added
+render the tool call and display the arguments that were passed to the tool.
+
+</Step>
+</Steps>

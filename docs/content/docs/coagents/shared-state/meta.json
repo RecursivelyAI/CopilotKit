@@ -1,0 +1,9 @@
+{
+    "pages": [
+        "in-app-agent-read",
+        "in-app-agent-write",
+        "predictive-state-updates",
+        "emit-messages",
+        "state-streaming"
+    ]
+}

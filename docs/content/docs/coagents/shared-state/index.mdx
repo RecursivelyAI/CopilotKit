@@ -1,0 +1,41 @@
+---
+title: Shared State
+description: Create a two-way connection between your UI and agent state.
+icon: "lucide/Repeat"
+---
+import { ImageZoom } from "fumadocs-ui/components/image-zoom";
+
+<ImageZoom 
+    src="/images/coagents/SharedStateCoAgents.gif" 
+    alt="Shared State Demo" 
+    width={1000} 
+    height={1000} 
+    className="rounded-lg shadow-lg border mt-0"
+/>
+
+<Callout>
+    This video demonstrates the [Research Canvas](/coagents/examples/research-canvas) utilizing shared state.
+</Callout>
+
+
+## What is shared state?
+
+CoAgents maintain a shared state that seamlessly connects your UI with the agent's execution. This shared state system allows you to:
+- Display the agent's current progress and intermediate results
+- Update the agent's state through UI interactions
+- React to state changes in real-time across your application
+
+<Frame>
+    <img src="/images/coagents/coagents-state-diagram.png" alt="Agentic Copilot State Diagram" />
+</Frame>
+
+The foundation of this system is built on LangGraph's stateful architecture. Unlike traditional LangChains, LangGraphs maintain their
+internal state throughout execution, which you can access via the `useCoAgentState` hook.
+
+## When should I use this?
+State streaming is perfect when you want to faciliate collaboration between your agent and the user. Any state that your LangGraph agent
+persists will be automatically shared by the UI. Similarly, any state that the user updates in the UI will be automatically reflected
+
+This allows for a consistent experience where both the agent and the user are on the same page.
+
+## How can I use this?

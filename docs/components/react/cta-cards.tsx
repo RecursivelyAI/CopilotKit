@@ -37,7 +37,7 @@ export function CTACards({ cards, columns = 3 }: CTACardsProps) {
   const lastItemClass = cards.length % columns !== 0 ? `xl:col-span-${columns - (cards.length % columns) + 1}` : '';
 
   return (
-    <div className={`grid grid-cols-1 gap-y-8 gap-x-4 xl:grid-cols-${columns} py-6`}>
+    <div className={`grid grid-cols-1 gap-y-8 gap-x-10 xl:grid-cols-${columns} py-6`}>
       {cards.map((card, index) => (
         <div
           key={index}

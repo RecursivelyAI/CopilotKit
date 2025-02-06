@@ -1,0 +1,151 @@
+---
+title: Frontend Actions
+icon: "lucide/Wrench"
+description: Create frontend actions and use them within your agent.
+---
+import InstallSDKSnippet from "@/snippets/install-sdk.mdx"
+
+<video src="/images/frontend-actions-demo.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+<Callout>
+    This video shows the [coagents starter](https://github.com/copilotkit/coagents-starter) repo with the [implementation](#implementation) section applied to it!
+</Callout>
+
+## What is this?
+
+Frontend actions are powerful tools that allow your AI agents to directly interact with and update your application's user interface. Think of them as bridges that connect your agent's decision-making capabilities with your frontend's interactive elements.
+
+## When should I use this?
+
+Frontend actions are essential when you want to create truly interactive AI applications where your agent needs to:
+
+- Dynamically update UI elements
+- Trigger frontend animations or transitions
+- Show alerts or notifications
+- Modify application state
+- Handle user interactions programmatically
+
+Without frontend actions, agents are limited to just processing and returning data. By implementing frontend actions, you can create rich, interactive experiences where your agent actively drives the user interface.
+
+## Implementation
+
+<Steps>
+    <Step>
+        ### Setup CopilotKit
+
+        To use frontend actions, you'll need to setup CopilotKit first. For the sake of brevity, we won't cover it here. 
+
+        Check out our [getting started guide](/coagents/quickstart/langgraph) and come back here when you're setup!
+    </Step>
+
+    <Step>
+        ### Create a frontend action
+
+        First, you'll need to create a frontend action using the [useCopilotAction](/reference/hooks/useCopilotAction) hook. Here's a simple one to get you started
+        that says hello to the user.
+
+        ```tsx title="page.tsx"
+        import { useCopilotAction } from "@copilotkit/react-core" // [!code highlight]
+            
+        export function Page() {
+          // ...
+
+          // [!code highlight:16]
+          useCopilotAction({
+            name: "sayHello",
+            description: "Say hello to the user",
+            available: "remote", // optional, makes it so the action is *only* available to the agent
+            parameters: [
+              {
+                name: "name",
+                type: "string",
+                description: "The name of the user to say hello to",
+                required: true,
+              },
+            ],
+            handler: async ({ name }) => {
+              alert(`Hello, ${name}!`);
+            },
+          });
+
+          // ...
+        }
+        ```
+    </Step>
+    <Step>
+        ###  Modify your agent
+        Now, we'll need to modify the agent to access these frontend actions. Open up for your agent's folder and continue from there!
+    </Step>
+    <Step>
+        ### Install the CopilotKit SDK
+        <InstallSDKSnippet components={props.components}/>
+    </Step>
+    <Step>
+        ### Inheriting from CopilotKitState
+
+        To access the frontend actions provided by CopilotKit, you can inherit from CopilotKitState in your agent's state definition:
+
+        <Tabs groupId="language" items={['Python', 'TypeScript']} default="Python">
+            <Tab value="Python">
+                ```python title="state.py"
+                from copilotkit import CopilotKitState # [!code highlight]
+
+                class YourAgentState(CopilotKitState): # [!code highlight]
+                    your_additional_properties: str
+                ```
+            </Tab>
+            <Tab value="TypeScript">
+                ```typescript title="state.ts"
+                import { Annotation } from "@langchain/langgraph";
+                import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph"; // [!code highlight]
+
+                export const YourAgentStateAnnotation = Annotation.Root({
+                    yourAdditionalProperty: Annotation<string>,
+                    ...CopilotKitStateAnnotation.spec, // [!code highlight]
+                });
+                export type YourAgentState = typeof YourAgentStateAnnotation.State;
+                ```
+            </Tab>
+        </Tabs>
+
+        By doing this, your agent's state will include the `copilotkit` property, which contains the frontend actions that can be accessed and invoked.
+    </Step>
+    <Step>
+        ### Accessing Frontend Actions
+
+        Once your agent's state includes the `copilotkit` property, you can access the frontend actions and utilize them within your agent's logic.
+
+        Here's how you can call a frontend action from your agent:
+
+        <Tabs groupId="language" items={['Python', 'TypeScript']} default="Python">
+            <Tab value="Python">
+                ```python title="agent.py"
+                async def agent_node(state: YourAgentState, config: RunnableConfig):
+                    # Access the actions from the copilotkit property
+
+                    actions = state.get("copilotkit", {}).get("actions", []) # [!code highlight]
+                    model = ChatOpenAI(model="gpt-4o").bind_tools(actions)
+
+                    # ...
+                ```
+            </Tab>
+            <Tab value="TypeScript">
+                ```typescript title="agent.ts"
+                async function agentNode(state: YourAgentState, config: RunnableConfig): Promise<YourAgentState> {
+                    // Access the actions from the copilotkit property
+
+                    const actions = state.copilotkit.actions; // [!code highlight]
+                    const model = ChatOpenAI({ model: 'gpt-4o' }).bindTools(actions);
+
+                    // ...
+                }
+                ```
+            </Tab>
+        </Tabs>
+
+        These actions are automatically populated by CopilotKit and are compatible with LangChain's tool call definitions, making it straightforward to integrate them into your agent's workflow.
+    </Step>
+    <Step>
+        ### Give it a try!
+        You've now given your agent the ability to directly call any CopilotActions you've defined. These actions will be available as tools to the agent where they can be used as needed.
+    </Step>
+</Steps>

@@ -1,0 +1,140 @@
+---
+title: Writing agent state
+icon: "lucide/ArrowRight"
+description: Write to agent's state from your application.
+---
+
+<video src="/images/coagents/write-agent-state.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+<Callout>
+  This video shows the [coagents starter](https://github.com/copilotkit/coagents-starter) repo with the previous steps applied to it!
+</Callout>
+
+## What is this?
+
+This guide shows you how to write to your agent's state from your application.
+
+## When should I use this?
+
+You can use this when you want to provide the user with feedback about what your agent is doing, specifically
+when your agent is calling tools. CopilotKit allows you to fully customize how these tools are rendered in the chat.
+
+## Implementation
+
+<Steps>
+  <Step>
+    ### Run and Connect Your Agent to CopilotKit
+
+    You'll need to run your agent and connect it to CopilotKit before proceeding. If you haven't done so already,
+    you can follow the instructions in the [Getting Started](/getting-started) guide.
+
+    If you don't already have an agent, you can use the [coagent starter](https://github.com/copilotkit/copilotkit/tree/main/examples/coagent-starter) as a starting point
+    as this guide uses it as a starting point.
+
+  </Step>
+  <Step>
+    ### Define the Agent State
+    LangGraph is stateful. As you transition between nodes, that state is updated and passed to the next node. For this example,
+    let's assume that our agent state looks something like this.
+
+    ```python title="agent/sample_agent/agent.py"
+    from copilotkit import CopilotKitState
+    from typing import Literal
+
+    class AgentState(CopilotKitState):
+        language: Literal["english", "spanish"] = "english"
+    ```
+  </Step>
+  <Step>
+    ### Call `setState` function from the `useCoAgent` hook
+    `useCoAgent` returns a `setState` function that you can use to update the agent state. Calling this
+    will update the agent state and trigger a rerender of anything that depends on the agent state.
+
+    ```tsx title="ui/app/page.tsx"
+    import { useCoAgent } from "@copilotkit/react-core"; // [!code highlight]
+
+    // Define the agent state type, should match the actual state of your agent
+    type AgentState = {
+      language: "english" | "spanish";
+    }
+
+    // Example usage in a pseudo React component
+    function YourMainContent() {
+      const { state, setState } = useCoAgent<AgentState>({ // [!code highlight]
+        name: "sample_agent",
+        initialState: { language: "spanish" }  // optionally provide an initial state
+      });
+
+      // ...
+
+      const toggleLanguage = () => {
+        setState({ language: state.language === "english" ? "spanish" : "english" }); // [!code highlight]
+      };
+
+      // ...
+
+      return (
+        // style excluded for brevity
+        <div>
+          <h1>Your main content</h1>
+          <p>Language: {state.language}</p> // [!code highlight:2]
+          <button onClick={toggleLanguage}>Toggle Language</button>
+        </div>
+      );
+    }
+    ```
+  </Step>
+  <Step>
+    ### Give it a try!
+    You can now use the `setState` function to update the agent state and `state` to read it. Try toggling the language button
+    and talking to your agent. You'll see the language change to match the agent's state.
+  </Step>
+</Steps>
+
+## Advanced Usage
+
+### Re-run the agent with a hint about what's changed
+
+The new agent state will be used next time the agent runs.
+If you want to re-run it manually, use the `run` argument on the `useCoAgent` hook.
+
+The agent will be re-run, and it will get not only the latest updated state, but also a **hint** that can depend on the data delta between the previous and the current state.
+
+```tsx title="ui/app/page.tsx"
+import { useCoAgent } from "@copilotkit/react-core";
+import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";  // [!code highlight]
+
+// ...
+
+function YourMainContent() {
+  const { state, setState, run } = useCoAgent<AgentState>({
+    name: "sample_agent",
+    initialState: { language: "spanish" }  // optionally provide an initial state
+  });
+
+  // setup to be called when some event in the app occurs
+  const toggleLanguage = () => {
+    const newLanguage = state.language === "english" ? "spanish" : "english";
+    setState({ language: newLanguage });
+
+    // re-run the agent and provide a hint about what's changed
+    run(({ previousState, currentState }) => { // [!code highlight:6]
+      return new TextMessage({
+        role: MessageRole.User,
+        content: `the language has been updated to ${currentState.language}`,
+      });
+    });
+  };
+
+  return (
+    // ...
+  );
+}
+```
+
+### Intermediately Stream and Render Agent State
+By default, the LangGraph agent state will only update *between* LangGraph node transitions --
+which means state updates will be discontinuous and delayed.
+
+You likely want to render the agent state as it updates **continuously.**
+
+See **[emit intermediate state](/coagents/shared-state/intermediate-state-streaming).**

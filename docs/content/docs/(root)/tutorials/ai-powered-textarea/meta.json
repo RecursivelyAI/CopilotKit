@@ -1,5 +1,6 @@
 {
   "title": "Tutorial: AI Powered Textarea",
+  "icon": "lucide/TextSelect",
   "pages": [
     "overview",
     "step-1-checkout-repo",

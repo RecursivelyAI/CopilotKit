@@ -15,8 +15,11 @@
 }
 
 @layer base {
+  #nd-sidebar > div.overflow-hidden.flex-1 > div{
+    @apply px-4;
+  }
   :root {
-    
+    --fd-sidebar-width: 330px !important;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -58,6 +61,16 @@
     --info-foreground: 0 0% 98%;
     --info-muted: 214 95% 90%;
     --info-muted-foreground: 214 95% 30%;
+  }
+  @media (max-width: 1200px) {
+    :root {
+      --fd-sidebar-width: 280px !important;
+    }
+  }
+  @media (max-width: 640px) {
+    :root {
+      --fd-sidebar-width: 260px !important;
+    }
   }
   .dark {
     --background: 0 0% 3.9%;

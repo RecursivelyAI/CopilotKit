@@ -1,0 +1,278 @@
+import { MultiProviderContent, If } from "@/components/react/multi-provider-content/multi-provider-content";
+import { quickStartProviders } from "@/components/react/multi-provider-content/utils";
+import { IoLogoVercel, IoLogoNodejs } from "react-icons/io5";
+import { SiNestjs } from "react-icons/si";
+import { RiNextjsLine } from "react-icons/ri";
+
+<Tabs groupId="endpoint-type" items={[
+  { value: 'Next.js App Router', icon: <RiNextjsLine className="text-xl" /> },
+  { value: 'Next.js Pages Router', icon: <RiNextjsLine className="text-xl" /> },
+  { value: 'Node.js Express', icon: <IoLogoNodejs className="text-xl" /> },
+  { value: 'Node.js HTTP', icon: <IoLogoNodejs className="text-xl" /> },
+  { value: 'NestJS', icon: <SiNestjs className="text-xl" /> }
+]}>
+  {/* Next.js App Router */}
+  <Tab value="Next.js App Router">
+    Create a new route to handle the `/api/copilotkit` endpoint.
+
+    ```ts title="app/api/copilotkit/route.ts"
+    import {
+      CopilotRuntime,
+      OpenAIAdapter,
+      copilotRuntimeNextJSAppRouterEndpoint,
+      langGraphPlatformEndpoint
+    } from "@copilotkit/runtime";
+    import OpenAI from "openai";
+    import { NextRequest } from "next/server";
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const serviceAdapter = new OpenAIAdapter({ openai } as any);
+
+    const runtime = new CopilotRuntime({
+      remoteEndpoints: [
+        // [!code highlight:12]
+        langGraphPlatformEndpoint({
+          deploymentUrl: "your-api-url", // make sure to replace with your real deployment url,
+          langsmithApiKey: process.env.LANGSMITH_API_KEY, // only used in LangGraph Platform deployments
+          agents: [ // List any agents available under "graphs" list in your langgraph.json file; give each a description explaining when it should be called.
+            {
+              name: 'my_agent', 
+              description: 'A helpful LLM agent.'
+              assistantId: 'your-assistant-ID' // optional, but recommended!
+            }
+          ]
+        }),
+      ],
+    });
+
+    export const POST = async (req: NextRequest) => {
+      const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
+        runtime,
+        serviceAdapter,
+        endpoint: "/api/copilotkit",
+      });
+
+      return handleRequest(req);
+    };
+    ```
+  </Tab>
+
+    {/* Next.js Pages Router */}
+    <Tab value="Next.js Pages Router">
+        Create a new route to handle the `/api/copilotkit` endpoint:
+
+        ```ts title="pages/api/copilotkit.ts"
+        import {
+          CopilotRuntime,
+          OpenAIAdapter,
+          copilotRuntimeNextJSPagesRouterEndpoint,
+          langGraphPlatformEndpoint
+        } from '@copilotkit/runtime';
+        import OpenAI from "openai";
+        import { NextApiRequest, NextApiResponse } from 'next';
+
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const serviceAdapter = new OpenAIAdapter({ openai } as any);
+
+        const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+          const runtime = new CopilotRuntime({
+            remoteEndpoints: [
+              // [!code highlight:12]
+              langGraphPlatformEndpoint({
+                deploymentUrl: "your-api-url", // make sure to replace with your real deployment url
+                langsmithApiKey: process.env.LANGSMITH_API_KEY, // only used in LangGraph Platform deployments
+                agents: [ // List any agents available under "graphs" list in your langgraph.json file; give each a description explaining when it should be called.
+                  {
+                    name: 'my_agent',
+                    description: 'A helpful LLM agent.'
+                    assistantId: 'your-assistant-ID' // optional, but recommended!
+                  }
+                ]
+              }),
+            ],
+          });
+
+          const handleRequest = copilotRuntimeNextJSPagesRouterEndpoint({
+            endpoint: '/api/copilotkit',
+            runtime,
+            serviceAdapter,
+          });
+
+          return await handleRequest(req, res);
+        };
+
+        export default handler;
+        ```
+
+        Your Copilot Runtime endpoint should be available at `http://localhost:3000/api/copilotkit`.
+    </Tab>
+
+    {/* Node.js Express */}
+    <Tab value="Node.js Express">
+        Create a new Express.js app and set up the Copilot Runtime handler:
+
+        ```ts title="server.ts"
+        import express from 'express';
+        import {
+          CopilotRuntime,
+          OpenAIAdapter,
+          copilotRuntimeNodeHttpEndpoint,
+          langGraphPlatformEndpoint
+        } from '@copilotkit/runtime';
+        import OpenAI from "openai";
+
+        const app = express();
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const serviceAdapter = new OpenAIAdapter({ openai } as any);
+
+        app.use('/copilotkit', (req, res, next) => {
+          const runtime = new CopilotRuntime({
+            remoteEndpoints: [
+              // [!code highlight:12]
+              langGraphPlatformEndpoint({
+                deploymentUrl: "your-api-url", // make sure to replace with your real deployment url
+                langsmithApiKey: process.env.LANGSMITH_API_KEY, // only used in LangGraph Platform deployments
+                agents: [ // List any agents available under "graphs" list in your langgraph.json file; give each a description explaining when it should be called.
+                  {
+                    name: 'my_agent',
+                    description: 'A helpful LLM agent.'
+                    assistantId: 'your-assistant-ID' // optional, but recommended!
+                  }
+                ]
+              }),
+            ],
+          });
+
+          const handler = copilotRuntimeNodeHttpEndpoint({
+            endpoint: '/copilotkit',
+            runtime,
+            serviceAdapter,
+          });
+
+          return handler(req, res, next);
+        });
+
+        app.listen(4000, () => {
+          console.log('Listening at http://localhost:4000/copilotkit');
+        });
+        ```
+
+        Your Copilot Runtime endpoint should be available at `http://localhost:4000/copilotkit`.
+
+        <Callout type="warn">
+            Remember to point your `runtimeUrl` to the correct endpoint in your client-side code, e.g. `http://localhost:PORT/copilotkit`.
+        </Callout>
+    </Tab>
+
+    {/* Node.js HTTP */}
+    <Tab value="Node.js HTTP">
+        Set up a simple Node.js HTTP server and use the Copilot Runtime to handle requests:
+
+        ```ts title="server.ts"
+        import { createServer } from 'node:http';
+        import {
+          CopilotRuntime,
+          OpenAIAdapter,
+          copilotRuntimeNodeHttpEndpoint,
+          langGraphPlatformEndpoint
+        } from '@copilotkit/runtime';
+        import OpenAI from "openai";
+
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const serviceAdapter = new OpenAIAdapter({ openai } as any);
+
+        const server = createServer((req, res) => {
+          const runtime = new CopilotRuntime({
+            remoteEndpoints: [
+              // [!code highlight:12]
+              langGraphPlatformEndpoint({
+                deploymentUrl: "your-api-url", // make sure to replace with your real deployment url
+                langsmithApiKey: process.env.LANGSMITH_API_KEY, // only used in LangGraph Platform deployments
+                agents: [ // List any agents available under "graphs" list in your langgraph.json file; give each a description explaining when it should be called.
+                  {
+                    name: 'my_agent',
+                    description: 'A helpful LLM agent.'
+                    assistantId: 'your-assistant-ID' // optional, but recommended!
+                  }
+                ]
+              }),
+            ],
+          });
+
+          const handler = copilotRuntimeNodeHttpEndpoint({
+            endpoint: '/copilotkit',
+            runtime,
+            serviceAdapter,
+          });
+
+          return handler(req, res);
+        });
+
+        server.listen(4000, () => {
+          console.log('Listening at http://localhost:4000/copilotkit');
+        });
+        ```
+
+        Your Copilot Runtime endpoint should be available at `http://localhost:4000/copilotkit`.
+
+        <Callout type="warn">
+            Remember to point your `runtimeUrl` to the correct endpoint in your client-side code, e.g. `http://localhost:PORT/copilotkit`.
+        </Callout>
+    </Tab>
+
+    {/* NestJS */}
+    <Tab value="NestJS">
+        Set up a controller in NestJS to handle the Copilot Runtime endpoint:
+
+        ```ts title="copilotkit.controller.ts"
+        import { All, Controller, Req, Res } from '@nestjs/common';
+        import { 
+          CopilotRuntime, 
+          copilotRuntimeNestEndpoint, 
+          OpenAIAdapter,
+          langGraphPlatformEndpoint 
+        } from '@copilotkit/runtime';
+        import { Request, Response } from 'express';
+        import OpenAI from "openai";
+
+        @Controller()
+        export class CopilotkitController {
+          @All('/copilotkit')
+          copilotkit(@Req() req: Request, @Res() res: Response) {
+            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+            const serviceAdapter = new OpenAIAdapter({ openai } as any);
+            
+            const runtime = new CopilotRuntime({
+              remoteEndpoints: [
+                // [!code highlight:12]
+                langGraphPlatformEndpoint({
+                  deploymentUrl: "your-api-url", // make sure to replace with your real deployment url
+                  langsmithApiKey: process.env.LANGSMITH_API_KEY, // only used in LangGraph Platform deployments
+                  agents: [ // List any agents available under "graphs" list in your langgraph.json file; give each a description explaining when it should be called.
+                    {
+                      name: 'my_agent',
+                      description: 'A helpful LLM agent.'
+                      assistantId: 'your-assistant-ID' // optional, but recommended!
+                    }
+                  ]
+                }),
+              ],
+            });
+
+            const handler = copilotRuntimeNestEndpoint({
+              runtime,
+              serviceAdapter,
+              endpoint: '/copilotkit',
+            });
+            return handler(req, res);
+          }
+        }
+        ```
+
+        Your Copilot Runtime endpoint should be available at `http://localhost:3000/copilotkit`.
+
+        <Callout type="warn">
+            Remember to point your `runtimeUrl` to the correct endpoint in your client-side code, e.g. `http://localhost:PORT/copilotkit`.
+        </Callout>
+    </Tab>
+</Tabs>

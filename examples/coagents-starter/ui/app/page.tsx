@@ -1,65 +1,50 @@
 "use client";
 
-import { useCopilotAction } from "@copilotkit/react-core";
-import { CopilotPopup } from "@copilotkit/react-ui";
+import { useCoAgent, useCoAgentStateRender, useCopilotAction } from "@copilotkit/react-core";
+import { CopilotSidebar } from "@copilotkit/react-ui";
 import { useState } from "react";
 
 export default function Home() {
   return (
-    <>
+    <main>
       <YourMainContent />
-      <CopilotPopup
+      <CopilotSidebar
         defaultOpen={true}
         labels={{
           title: "Popup Assistant",
-          initial: "Need any help?",
+          initial: "Hi! I'm connected to an agent. How can I help?",
         }}
       />
-    </>
+    </main>
   );
 }
 
 function YourMainContent() {
   const [backgroundColor, setBackgroundColor] = useState("#ADD8E6");
+
+  // Render a greeting in the chat
   useCopilotAction({
-    name: "greet_user",
-    available: "disabled",
+    name: "greetUser",
+    available: "remote", // make this available only to the agent
     parameters: [
       {
         name: "name",
         description: "The name of the user to greet.",
       },
     ],
-    render: ({ args, result, status }) => {
+    render: ({ args }) => {
       return (
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 border-b" colSpan={2}>
-                greet_user called
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="px-4 py-2 border-b">args</td>
-              <td className="px-4 py-2 border-b">{JSON.stringify(args)}</td>
-            </tr>
-            <tr>
-              <td className="px-4 py-2 border-b">result</td>
-              <td className="px-4 py-2 border-b">{result}</td>
-            </tr>
-            <tr>
-              <td className="px-4 py-2 border-b">status</td>
-              <td className="px-4 py-2 border-b">{status}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="text-lg font-bold bg-blue-500 text-white p-2 rounded-xl text-center">
+          Hello, {args.name}!
+        </div>
       );
     },
   });
+
+  // Action for setting the background color
   useCopilotAction({
     name: "setBackgroundColor",
+    available: "remote", // make this available only to the agent
     parameters: [
       {
         name: "backgroundColor",
@@ -71,12 +56,29 @@ function YourMainContent() {
       setBackgroundColor(backgroundColor);
     },
   });
+
+  const { state } = useCoAgent({
+    name: "sample_agent",
+  })
+
+  useCoAgentStateRender({
+    name: "sample_agent",
+    render: ({ state }) => {
+      if (!state.progress) return null;
+      return <div>Progress: {state.progress}</div>;
+    },
+  });
+
+  // Render the main content
   return (
     <div
       style={{ backgroundColor }}
-      className="h-screen w-screen flex justify-center items-center text-2xl"
+      className="h-screen w-screen flex justify-center items-center flex-col"
     >
-      Your main content
+      <h1 className="bg-blue-500 p-10 rounded-xl text-white text-4xl">
+        Your main content
+      </h1>
+      {state.progress > 0 && <div>Progress: {state.progress}</div>}
     </div>
   );
 }

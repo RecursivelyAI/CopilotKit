@@ -1,5 +1,6 @@
 {
   "title": "Tutorial: AI Todo App",
+  "icon": "lucide/ListChecks",
   "pages": [
     "overview",
     "step-1-checkout-repo",

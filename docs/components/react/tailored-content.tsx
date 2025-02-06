@@ -19,12 +19,13 @@ export function TailoredContentOption({ title, description, icon, children }: Ta
 
 type TailoredContentProps = {
   children: ReactNode;
+  header?: ReactNode;
   className?: string;
   defaultOptionIndex?: number;
   id: string;
 };
 
-export function TailoredContent({ children, className, defaultOptionIndex = 0, id }: TailoredContentProps) {
+export function TailoredContent({ children, className, defaultOptionIndex = 0, id, header }: TailoredContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -67,6 +68,7 @@ export function TailoredContent({ children, className, defaultOptionIndex = 0, i
   return (
     <div>
       <div className={cn("tailored-content-wrapper mt-4", className)}>
+        {header}
         <div className="flex flex-col md:flex-row gap-3 my-2 w-full">
           {options.map((option, index) => (
             <div

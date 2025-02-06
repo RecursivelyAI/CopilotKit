@@ -14,7 +14,11 @@ export default function RootLayout({ children }: { children: any }) {
   return (
     <html lang="en">
       <body>
-        <CopilotKit agent="greeter" runtimeUrl="/api/copilotkit">
+        <CopilotKit
+          agent="sample_agent" // lock the agent to the sample_agent since we only have one agent
+          runtimeUrl="/api/copilotkit"
+          showDevConsole={false}
+        >
           {children}
         </CopilotKit>
       </body>

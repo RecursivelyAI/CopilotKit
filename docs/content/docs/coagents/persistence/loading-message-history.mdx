@@ -1,0 +1,70 @@
+---
+title: Threads
+description: Learn how to load chat messages and threads within the CopilotKit framework.
+icon: "lucide/MessagesSquare"
+---
+
+LangGraph supports threads, a way to group messages together and ultimately maintain a continuous chat history. CopilotKit
+provides a few different ways to interact with this concept.
+
+This guide assumes you have already gone through the [quickstart](/quickstart) guide.
+
+## Loading an Existing Thread
+
+To load an existing thread in CopilotKit, you can simply set the `threadId` property on `<CopilotKit>` like so.
+
+<Callout>
+  When using LangGraph platform, the `threadId` must be a UUID.
+</Callout>
+
+```tsx
+import { CopilotKit } from "@copilotkit/react-core";
+
+<CopilotKit threadId="37aa68d0-d15b-45ae-afc1-0ba6c3e11353"> // [!code highlight]
+  <YourApp />
+</CopilotKit>
+```
+
+## Dynamically Switching Threads
+
+You can also make the `threadId` dynamic. Once it is set, CopilotKit will load the previous messages for that thread.
+
+```tsx
+import { useState } from "react";
+import { CopilotKit } from "@copilotkit/react-core";
+
+const Page = () => {
+  const [threadId, setThreadId] = useState("af2fa5a4-36bd-4e02-9b55-2580ab584f89"); // [!code highlight]
+  return (
+    <CopilotKit threadId={threadId}> // [!code highlight]
+      <YourApp setThreadId={setThreadId} /> // [!code highlight]
+    </CopilotKit>
+  )
+}
+
+const YourApp = () => {
+  return (
+    <Button onClick={() => setThreadId("679e8da5-ee9b-41b1-941b-80e0cc73a008")}> // [!code highlight]
+      Change Thread
+    </Button>
+  )
+}
+```
+
+## Using setThreadId
+
+CopilotKit will also return the current `threadId` and a `setThreadId` function from the `useCopilotContext` hook. You can use `setThreadId` to change the `threadId`.
+
+```tsx
+import { useCopilotContext } from "@copilotkit/react-core";
+
+const ChangeThreadButton = () => {
+  const { threadId, setThreadId } = useCopilotContext(); // [!code highlight]
+  return (
+    <Button onClick={() => setThreadId("d73c22f3-1f8e-4a93-99db-5c986068d64f")}> // [!code highlight]
+      Change Thread
+    </Button>
+  )
+}
+```
+

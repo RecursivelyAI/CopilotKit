@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "greeter"
+name = "sample_agent"
 version = "0.1.0"
 description = "Starter"
 authors = ["Ariel Weinberger <weinberger.ariel@gmail.com>"]
 license = "MIT"
 
 [project]
-name = "greeter"
+name = "sample_agent"
 version = "0.0.1"
 
 [build-system]
@@ -27,4 +27,4 @@ langchain-core = "^0.3.25"
 langgraph-cli = {extras = ["inmem"], version = "^0.1.64"}
 
 [tool.poetry.scripts]
-demo = "greeter.demo:main"
+demo = "sample_agent.demo:main"

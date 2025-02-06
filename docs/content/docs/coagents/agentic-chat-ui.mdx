@@ -1,0 +1,30 @@
+---
+title: Chat with an Agent
+icon: "lucide/SendHorizontal"
+description: Chat with an agent using CopilotKit's UI components.
+---
+import ConnectCopilotUI from "@/snippets/copilot-ui.mdx";
+import SelfHostingCopilotRuntimeCreateEndpoint from "@/snippets/self-hosting-copilot-runtime-create-endpoint.mdx";
+import SelfHostingCopilotRuntimeConfigureCopilotKitProvider from "@/snippets/self-hosting-copilot-runtime-configure-copilotkit-provider.mdx";
+import CopilotCloudConfigureCopilotKitProvider from "@/snippets/cloud/cloud-copilotkit-provider.mdx";
+import ComponentExamples from "@/snippets/component-examples.mdx";
+import { UserIcon, PaintbrushIcon, WrenchIcon, RepeatIcon } from "lucide-react";
+
+<video src="/images/coagents/agentic-chat-ui.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+<Callout>
+    This video shows the [coagents starter](https://github.com/copilotkit/coagents-starter) repo with various Copilot UI components applied to it!
+</Callout>
+
+## What is this?
+
+Agentic chat UIs are ways for your users to interact with your agent. CopilotKit provides a variety of different components to choose from, each
+with their own unique use cases.
+
+If you've gone through the [getting started guide](/coagents/quickstart/langgraph) **you already have a agentic chat UI setup**! Nothing else is needed
+to get started.
+
+## When should I use this?
+CopilotKit provides a variety of different batteries-included components to choose from to create agent native applications. They scale
+from simple chat UIs to completely custom applications.
+
+<ComponentExamples components={props.components} />

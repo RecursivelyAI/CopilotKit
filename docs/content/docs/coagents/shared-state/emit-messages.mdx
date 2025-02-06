@@ -1,0 +1,98 @@
+---
+title: "Manually emitting messages"
+icon: "lucide/Radio"
+---
+import InstallSDKSnippet from "@/snippets/install-sdk.mdx"
+import RunAndConnectSnippet from "@/snippets/coagents/run-and-connect-agent.mdx"
+
+While most agent interactions happen automatically through shared state updates as the agent runs, you can also **manually send messages from within your agent code** to provide immediate feedback to users.
+
+<video src="/images/coagents/emit-messages.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+<Callout>
+    This video shows the [coagents starter](https://github.com/copilotkit/coagents-starter) repo with the [implementation](#implementation) section applied to it!
+</Callout>
+
+## What is this?
+
+In LangGraph, messages are only emitted when a node is completed. CopilotKit allows you to manually emit messages
+in the middle of a node's execution to provide immediate feedback to the user.
+
+## When should I use this?
+
+Manually emitted messages are great for **when you don't want to wait for the node** to complete **and you**:
+- Have a long running task that you want to provide feedback on
+- Want to provide a status update to the user
+- Want to provide a warning or error message
+
+## Implementation
+
+<Steps>
+    <Step>
+        ### Run and Connect Your Agent to CopilotKit
+        <RunAndConnectSnippet />
+    </Step>
+    <Step>
+        ### Install the CopilotKit SDK
+        <InstallSDKSnippet components={props.components}/>
+    </Step>
+    <Step>
+        ### Manually emit a message
+        The `copilotkit_emit_message` method allows you to emit messages early in a node's execution to communicate status updates to the user. This is particularly useful for long running tasks.
+
+        <Tabs groupId="language" items={['Python', 'TypeScript']} default="Python">
+            <Tab value="Python">
+                ```python
+                from copilotkit.langgraph import copilotkit_emit_message # [!code highlight]
+                # ...
+
+                async def chat_node(state: AgentState, config: RunnableConfig):
+                    model = ChatOpenAI(model="gpt-4o")
+
+                    # [!code highlight:4]
+                    intermediate_message = "Thinking really hard..."
+                    await copilotkit_emit_message(state, intermediate_message)
+                    await asyncio.sleep(2) # simulate a long running task
+
+                    response = await model.ainvoke([
+                        SystemMessage(content="You are a helpful assistant.")
+                        *state["messages"]
+                    ], config)
+                    
+                    return Command(
+                        goto=END,
+                        update={
+                            # Make sure to include the emitted message in the messages history # [!code highlight:2]
+                            "messages": [AIMessage(content=intermediate_message), response]
+                        }
+                    )
+                ```
+            </Tab>
+            <Tab value="TypeScript">
+                ```typescript
+                import { AIMessage } from "@langchain/core/messages";
+                import { copilotkitEmitMessage } from "@copilotkit/sdk-js/langgraph";
+
+                // ...
+
+                async function askNameNode(state: GreetAgentState, config: RunnableConfig): Promise<AgentState> {
+                    /**
+                     * Ask the user for their name.
+                     */
+
+                    const content = "Hey, what is your name? 🙂";
+
+                    await copilotkitEmitMessage(config, content);
+
+                    // do something long running here...
+
+                    // make sure to return the emitted message so its apart of 
+                    // the messages history
+                    return {
+                        messages: new AIMessage({ content }),
+                    };
+                }
+                ```
+            </Tab>
+        </Tabs>
+    </Step>
+</Steps>

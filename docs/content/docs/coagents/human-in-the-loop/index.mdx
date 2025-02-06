@@ -1,0 +1,60 @@
+---
+title: Human in the Loop (HITL)
+icon: "lucide/User"
+description: Allow your agent and users to collaborate on complex tasks.
+---
+import { CTACards } from "@/components/react/cta-cards"
+import { Pause, Share2 } from "lucide-react"
+
+<video src="/images/coagents/human-in-the-loop-example.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+
+<Callout>
+  This video shows an example of our [AI Travel App](/coagents/tutorials/ai-travel-app) using HITL to get user feedback.
+</Callout>
+
+## What is Human-in-the-Loop (HITL)?
+
+Human-in-the-loop (HITL) allows agents to request human input or approval during execution, making AI systems more reliable and trustworthy. This pattern is essential when building AI applications that need to handle complex decisions or actions that require human judgment.
+
+<Frame className="my-0">
+    <img src="/images/coagents/coagents-hitl-infographic.png" alt="Agentic Copilot Human in the Loop" className="mt-4 mb-0 shadow-md" />
+</Frame>
+
+<Callout type="info">
+  Learn more about HITL in [LangGraph's concept guide](https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/).
+</Callout>
+
+## When should I use this?
+
+HITL combines the efficiency of AI with human judgment, creating a system that's both powerful and reliable. The key advantages include:
+
+- **Quality Control**: Human oversight at critical decision points
+- **Edge Cases**: Graceful handling of low-confidence situations
+- **Expert Input**: Leverage human expertise when needed
+- **Reliability**: More robust system for real-world use
+
+## How can I use this?
+
+Copilotkit provides two main approaches for HITL LangGraph workflows - interrupt and node-based.
+
+<Callout>
+  Unsure which approach to use? We recommend starting with the [Interrupt](/coagents/human-in-the-loop/interrupt-flow) flow.
+</Callout>
+
+<CTACards
+  columns={2}
+  cards={[
+    {
+      icon: Pause,
+      title: "Interrupt",
+      description: "Utilize LangGraph's interrupt function to pause the agent and wait for user input.",
+      href: "/coagents/human-in-the-loop/interrupt-flow"
+    },
+    {
+      icon: Share2,
+      title: "Node-based",
+      description: "Utilize nodes and tools to create LLM driven Human-in-the-Loop workflows.",
+      href: "/coagents/human-in-the-loop/node-flow"
+    }
+  ]}
+/>

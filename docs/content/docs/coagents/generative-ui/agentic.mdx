@@ -1,0 +1,160 @@
+---
+title: Agentic Generative UI
+icon: "lucide/Bot"
+description: Render the state of your agent with custom UI components.
+---
+import InstallSDKSnippet from "@/snippets/install-sdk.mdx"
+import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
+
+<video src="/images/coagents/agentic-generative-ui.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+<Callout>
+  This video demonstrates the [implementation](#implementation) section applied to out [coagents starter project](https://github.com/copilotkit/coagents-starter).
+</Callout>
+
+## What is this?
+
+All LangGraph agents are stateful. This means that as your agent progresses through nodes, a state object is passed between them perserving
+the overall state of a session. CopilotKit allows you to render this state in your application with custom UI components, which we call **Agentic Generative UI**.
+
+## When should I use this?
+
+Rendering the state of your agent in the UI is useful when you want to provide the user with feedback about the overall state of a session. A great example of this
+is a situation where a user and an agent are working together to solve a problem. The agent can store a draft in its state which is then rendered in the UI.
+
+## Implementation
+
+<Steps>
+  <Step>
+    ### Run and Connect your LangGraph to CopilotKit
+    First, you'll need to make sure you have a running LangGraph. If you haven't already done this, you can follow the [getting started guide](/coagents/quickstart/langgraph)
+
+    This guide uses the [CoAgents starter repo](https://github.com/CopilotKit/coagents-starter) as its starting point.
+
+  </Step>
+  <Step>
+    ### Define your agent state
+    If you're not familiar with LangGraph, your graphs are stateful. As you progress through nodes, a state object is passed between them. CopilotKit
+    allows you to easily render this state in your application. 
+    
+    For the sake of this guide, let's say our state looks like this in our agent.
+
+    <Tabs groupId="language" items={['Python', 'TypeScript']} default="Python">
+        <Tab value="Python">
+          ```python title="agent/sample_agent/agent.py"
+          # ...
+          from copilotkit import CopilotKitState # extends MessagesState
+          # ...
+
+          # This is the state of the agent.
+          # It inherits from the CopilotKitState properties from CopilotKit.
+          class AgentState(CopilotKitState):
+              searches: list[dict]
+          ```
+        </Tab>
+        <Tab value="TypeScript">
+          ```typescript title="agent/sample_agent/agent.ts"
+          // ...
+          import { Annotation } from "@langchain/langgraph";
+          import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
+          // ...
+
+          // This is the state of the agent.
+          // It inherits from the CopilotKitState properties from CopilotKit.
+          export const AgentStateAnnotation = Annotation.Root({
+            searches: Annotation<object[]>,
+            ...CopilotKitStateAnnotation.spec,
+          });
+          ```
+        </Tab>
+    </Tabs>
+  </Step>
+  <Step>
+    ### Render state of the agent in the chat
+    Now we can utilize `useCoAgentStateRender` to render the state of our agent **in the chat**.
+
+    ```tsx title="app/page.tsx"
+    // ...
+    import { useCoAgent } from "@copilotkit/react-core";
+    // ...
+
+    // Define the state of the agent, should match the state of the agent in your LangGraph.
+    type AgentState = {
+      searches: {
+        query: string;
+        done: boolean;
+      }[];
+    };
+
+    function YourMainContent() {
+      // ... 
+
+      // [!code highlight:14]
+      // styles omitted for brevity
+      useCoAgentStateRender<AgentState>({
+        name: "sample_agent", // the name the agent is served as
+        render: ({ state }) => (
+          <div>
+            {state.searches?.map((search, index) => (
+              <div key={index}>
+                {search.done ? "✅" : "❌"} {search.query}{search.done ? "" : "..."}
+              </div>
+            ))}
+          </div>
+        ),
+      });
+
+      // ...
+
+      return <div>...</div>;
+    }
+    ```
+  </Step>
+  <Step>
+    ### Render state outside of the chat
+    You can also render the state of your agent **outside of the chat**. This is useful when you want to render the state of your agent anywhere
+    other than the chat.
+
+    ```tsx title="app/page.tsx"
+    import { useCoAgent } from "@copilotkit/react-core"; // [!code highlight]
+    // ...
+
+    // Define the state of the agent, should match the state of the agent in your LangGraph.
+    type AgentState = {
+      searches: {
+        query: string;
+        done: boolean;
+      }[];
+    };
+
+    function YourMainContent() {
+      // ... 
+
+      // [!code highlight:5]
+      const { state } = useCoAgent<AgentState>({
+        name: "sample_agent", // the name the agent is served as
+      })
+
+      // ...
+
+      return (
+        <div>
+          {/* ... */}
+          <div className="flex flex-col gap-2 mt-4">
+            // [!code highlight:6]
+            {state.searches?.map((search, index) => (
+              <div key={index} className="flex flex-row">
+                {search.done ? "✅" : "❌"} {search.query}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+    ```
+  </Step>
+  <Step>
+    ### Give it a try!
+
+    You've now created a component that will render the agent's state in the chat.
+  </Step>
+</Steps>

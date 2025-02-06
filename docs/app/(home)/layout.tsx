@@ -29,7 +29,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                   selectedStyle: "ring-indigo-500/70 ring-2 rounded-sm",
                 },
                 {
-                  title: "CoAgents (LangGraph)\nPublic Beta",
+                  title: "CoAgents (Public Beta)",
                   description: "Documentation for CoAgents with LangGraph",
                   url: "/coagents",
                   icon: <PiGraph className="w-4 h-4 text-bold" />,

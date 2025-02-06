@@ -1,0 +1,105 @@
+---
+title: "Predictive state updates"
+icon: "lucide/Podcast"
+description: Stream in-progress agent state updates to the frontend.
+---
+import { CoAgentsEnterpriseCTA } from "@/components/react/coagents/coagents-enterprise-cta.tsx";
+import InstallSDKSnippet from "@/snippets/install-sdk.mdx"
+
+<video src="/images/coagents/intermediate-state-render.mp4" className="rounded-lg shadow-xl" loop inline controls autoPlay muted />
+<Callout>
+  This video shows the [coagents starter](https://github.com/copilotkit/coagents-starter) repo with the [implementation](#implementation) section applied to it!
+</Callout>
+
+## What is this?
+
+A LangGraph agent's state updates discontinuosly; only across node transitions in the graph.
+But even a _single node_ in the graph often takes many seconds to run and contain sub-steps of interest to the user.
+
+**Agent-native applications** reflect to the end-user what the agent is doing **as continuously possible.**
+
+CopilotKit enables this through its concept of **_predictive state updates_**.
+
+
+## When should I use this?
+You can use this when you want to provide the user with feedback about what your agent is doing, specifically to:
+
+- **Keep users engaged** by avoiding long loading indicators
+- **Build trust** by demonstrating what the agent is working on
+- Enable **agent steering** - allowing users to course-correct the agent if needed
+
+## Implementation
+
+<Steps>
+    <Step>
+        ### Install the CopilotKit SDK
+        <InstallSDKSnippet components={props.components}/>
+    </Step>
+    <Step>
+        ### Emit the intermediate state
+        For long-running tasks, you can emit the state progressively to the frontend. In this example we simulate a long-running task by counting up to 5, with one second between each update.
+        <Tabs groupId="language" items={['Python', 'TypeScript']} default="Python">
+            <Tab value="Python">
+                ```python
+                from copilotkit.langgraph import copilotkit_emit_state
+                # ...
+                async def chat_node(state: AgentState, config: RunnableConfig) -> Command[Literal["cpk_action_node", "tool_node", "__end__"]]:
+                    # ...
+                    # 1. Define the model
+                    model = ChatOpenAI(model="gpt-4o")
+
+                    # Simulate a long-running task by counting up to 5, with one second between each update
+                    for i in range(5):
+                        state["progress"] = i + 1
+                        await copilotkit_emit_state(config, state) # [!code highlight]
+                        await asyncio.sleep(1)
+                ```
+            </Tab>
+            <Tab value="TypeScript">
+                ```typescript
+                ```
+            </Tab>
+        </Tabs>
+    </Step>
+    <Step>
+        ### Render the intermediate state
+        These updates will be reflected in the frontend as the agent runs and can be used to render progress indicators.
+
+        ```tsx
+        import { useCoAgent, useCoAgentStateRender } from '@copilotkit/react-core';
+
+        // ...
+        
+        const YourMainContent = () => {
+            // ...
+            // Grab the state for reactive updates // [!code highlight:2]
+            const { state } = useCoAgent({ name: "sample_agent" });
+
+            // Add a state renderer to the chat // [!code highlight:8]
+            useCoAgentStateRender({
+                name: "sample_agent",
+                render: ({ state }) => {
+                    if (!state.progress) return null;
+                    return <div>Progress: {state.progress}</div>;
+                },
+            });
+
+            // ...
+
+            // styles omitted for brevity
+            return (
+                <div>
+                    <h1>Your main content</h1>
+                    {state.progress > 0 && <div>Progress: {state.progress}</div>} // [!code highlight]
+                </div>
+            )
+        }
+        ```
+    </Step>
+    <Step>
+        ### Give it a try!
+        Now you'll notice that the progress indicator is updated and emitted as the agent makes progress. You can apply this pattern
+        to any long-running task in your agent.
+    </Step>
+</Steps>
+
