@@ -6,9 +6,9 @@ from langchain_core.messages import SystemMessage, AIMessage, ToolMessage
 from langchain.tools import tool
 from langgraph.types import Command
 from copilotkit.langgraph import copilotkit_customize_config
-from research_canvas.state import AgentState
-from research_canvas.model import get_model
-from research_canvas.download import get_resource
+from research_canvas.langgraph.state import AgentState
+from research_canvas.langgraph.model import get_model
+from research_canvas.langgraph.download import get_resource
 
 
 @tool

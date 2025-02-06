@@ -10,8 +10,8 @@ from langchain_core.messages import AIMessage, ToolMessage, SystemMessage
 from langchain.tools import tool
 from tavily import TavilyClient
 from copilotkit.langgraph import copilotkit_emit_state, copilotkit_customize_config
-from research_canvas.state import AgentState
-from research_canvas.model import get_model
+from research_canvas.langgraph.state import AgentState
+from research_canvas.langgraph.model import get_model
 
 class ResourceInput(BaseModel):
     """A resource with a short description"""

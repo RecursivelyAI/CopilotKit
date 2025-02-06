@@ -13,7 +13,12 @@ export class StateResolver {
     const agent = agents.find((agent) => agent.name === data.agentName);
 
     if (!agent) {
-      throw new Error("Agent not found");
+      return {
+        threadId: data.threadId,
+        threadExists: false,
+        state: JSON.stringify({}),
+        messages: JSON.stringify([]),
+      };
     }
 
     const state = await ctx._copilotkit.runtime.loadAgentState(ctx, data.threadId, data.agentName);

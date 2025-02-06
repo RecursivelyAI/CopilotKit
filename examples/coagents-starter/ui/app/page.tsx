@@ -71,6 +71,7 @@ function YourMainContent() {
       setBackgroundColor(backgroundColor);
     },
   });
+
   return (
     <div
       style={{ backgroundColor }}

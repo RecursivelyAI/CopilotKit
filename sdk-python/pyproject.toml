@@ -10,7 +10,7 @@ repository = "https://github.com/CopilotKit/sdk-python"
 keywords = ["copilot", "copilotkit", "langgraph", "langchain", "ai", "langsmith", "langserve"]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.10,<3.13"
 langgraph = ">=0.2.50"
 httpx = "^0.27.2"
 fastapi = "^0.115.0"
@@ -20,7 +20,9 @@ langchain-anthropic = ">=0.2.3,<0.4.0"
 partialjson = "^0.0.8"
 langgraph-sdk = "^0.1.32"
 toml = "^0.10.2"
+crewai = {extras = ["tools"], version = "^0.98.0"}
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+

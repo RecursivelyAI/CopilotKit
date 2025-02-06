@@ -5,8 +5,11 @@ LangChain specific utilities for CopilotKit
 import uuid
 import json
 import warnings
-from typing import List, Optional, Any, Union, Dict, Callable, cast
 import asyncio
+from typing import List, Optional, Any, Union, Dict, Callable, cast
+from typing_extensions import TypedDict
+from langgraph.graph import MessagesState
+
 
 from langchain_core.messages import (
     HumanMessage,
@@ -23,6 +26,14 @@ from .logging import get_logger
 
 logger = get_logger(__name__)
 
+
+class CopilotKitProperties(TypedDict):
+    """CopilotKit state"""
+    actions: List[Any]
+
+class CopilotKitState(MessagesState):
+    """CopilotKit state"""
+    copilotkit: CopilotKitProperties
 
 
 def copilotkit_messages_to_langchain(
@@ -196,7 +207,7 @@ def copilotkit_customize_config(
     """
     Customize the LangGraph configuration for use in CopilotKit.
 
-    To the CopilotKit SDK, run:
+    To install the CopilotKit SDK, run:
 
     ```bash
     pip install copilotkit

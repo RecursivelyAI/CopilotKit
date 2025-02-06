@@ -34,12 +34,17 @@ export const ModelSelectorProvider = ({
     window.location.href = url.toString();
   };
 
-  const lgcDeploymentUrl = globalThis.window === undefined
+  const lgcDeploymentUrl =
+    globalThis.window === undefined
       ? null
-      : new URL(window.location.href).searchParams.get("lgcDeploymentUrl")
+      : new URL(window.location.href).searchParams.get("lgcDeploymentUrl");
 
-  const agent =
-    model === "google_genai" ? "research_agent_google_genai" : "research_agent";
+  let agent = "research_agent";
+  if (model === "google_genai") {
+    agent = "research_agent_google_genai";
+  } else if (model === "crewai") {
+    agent = "research_agent_crewai";
+  }
 
   return (
     <ModelSelectorContext.Provider

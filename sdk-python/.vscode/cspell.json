@@ -19,6 +19,8 @@
     "childrens",
     "partialjson",
     "dotenv",
-    "adispatch"
+    "adispatch",
+    "crewai",
+    "litellm"
   ]
 }

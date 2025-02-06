@@ -1,6 +1,6 @@
 """Actions"""
 
-
+import re
 from inspect import iscoroutinefunction
 from typing import Optional, List, Callable, TypedDict, Any, cast
 from .parameter import Parameter, normalize_parameters
@@ -29,6 +29,12 @@ class Action:  # pylint: disable=too-few-public-methods
         self.description = description
         self.parameters = parameters
         self.handler = handler
+
+        if not re.match(r"^[a-zA-Z0-9_-]+$", name):
+            raise ValueError(
+                f"Invalid action name '{name}': " +
+                "must consist of alphanumeric characters, underscores, and hyphens only"
+            )
 
     async def execute(
             self,

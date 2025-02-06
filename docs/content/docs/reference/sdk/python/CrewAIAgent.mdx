@@ -1,0 +1,108 @@
+---
+title: "CrewAIAgent"
+description: "CrewAIAgent lets you define your agent for use with CopilotKit."
+---
+
+{
+ /*
+  * ATTENTION! DO NOT MODIFY THIS FILE!
+  * This page is auto-generated. If you want to make any changes to this page, changes must be made at:
+  * CopilotKit/../sdk-python/copilotkit/crewai_agent.py
+  */
+}
+## CrewAIAgent
+
+CrewAIAgent lets you define your agent for use with CopilotKit.
+
+    To install, run:
+
+    ```bash
+    pip install copilotkit
+    ```
+
+    Every agent must have the `name` and either `crew` or `flow` properties defined. An optional 
+    `description` can also be provided. This is used when CopilotKit is dynamically routing requests 
+    to the agent.
+
+    ## Serving a Crew based agent
+
+    To serve a Crew based agent, pass in a `Crew` object to the `crew` parameter.
+
+    Note:
+    You need to make sure to have a `chat_llm` set on the `Crew` object.
+    See [the CrewAI docs](https://docs.crewai.com/concepts/cli#9-chat) for more information.
+
+    ```python
+    from copilotkit import CrewAIAgent
+
+
+    CrewAIAgent(
+        name="email_agent_crew",
+        description="This crew based agent sends emails",
+        crew=SendEmailCrew(),
+    )
+    ```
+
+    ## Serving a Flow based agent
+
+    To serve a Flow based agent, pass in a `Flow` object to the `flow` parameter.
+
+    ```python
+    CrewAIAgent(
+        name="email_agent_flow",
+        description="This flow based agent sends emails",
+        flow=SendEmailFlow(),
+    )
+    ```
+
+    Note:
+    Either a `crew` or `flow` must be provided to CrewAIAgent.
+
+### Parameters
+
+<PropertyReference name="name" type="str" required> 
+The name of the agent.
+</PropertyReference>
+
+<PropertyReference name="crew" type="Crew" required> 
+When using a Crew based agent, pass in a `Crew` object to the `crew` parameter.
+</PropertyReference>
+
+<PropertyReference name="flow" type="Flow" required> 
+When using a Flow based agent, pass in a `Flow` object to the `flow` parameter.
+</PropertyReference>
+
+<PropertyReference name="description" type="Optional[str]" > 
+The description of the agent.
+</PropertyReference>
+
+<PropertyReference name="copilotkit_config" type="Optional[CopilotKitConfig]" > 
+The CopilotKit config to use with the agent.
+</PropertyReference>
+
+## CopilotKitConfig
+
+CopilotKit config for CrewAIAgent
+
+    This is used for advanced cases where you want to customize how CopilotKit interacts with
+    CrewAI.
+
+    ```python
+    # Function signatures:
+    def merge_state(
+        *,
+        state: dict,
+        messages: List[BaseMessage],
+        actions: List[Any],
+        agent_name: str
+    ):
+        # ...implementation...
+
+    ```
+
+### Parameters
+
+<PropertyReference name="merge_state" type="Callable" required> 
+This function lets you customize how CopilotKit merges the agent state.
+</PropertyReference>
+

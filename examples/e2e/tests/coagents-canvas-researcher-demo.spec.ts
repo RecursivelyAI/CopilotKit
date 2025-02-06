@@ -16,6 +16,7 @@ import {
 const variants: TestVariants = [
   { name: "OpenAI", queryParams: "?coAgentsModel=openai" },
   { name: "Anthropic", queryParams: "?coAgentsModel=anthropic" },
+  { name: "CrewAI", queryParams: "?coAgentsModel=crewai" },
 ];
 
 // Get configurations

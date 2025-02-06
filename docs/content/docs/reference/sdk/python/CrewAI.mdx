@@ -1,0 +1,135 @@
+---
+title: "CrewAI SDK"
+description: "The CopilotKit CrewAI SDK for Python allows you to build and run CrewAI agents with CopilotKit."
+---
+
+{
+ /*
+  * ATTENTION! DO NOT MODIFY THIS FILE!
+  * This page is auto-generated. If you want to make any changes to this page, changes must be made at:
+  * CopilotKit/../sdk-python/copilotkit/crewai.py
+  */
+}
+## copilotkit_emit_state
+
+Emits intermediate state to CopilotKit. 
+    Useful if you have a longer running node and you want to update the user with the current state of the node.
+
+    To install the CopilotKit SDK, run:
+
+    ```bash
+    pip install copilotkit
+    ```
+
+    ### Examples
+
+    ```python
+    from copilotkit.crewai import copilotkit_emit_state
+
+    for i in range(10):
+        await some_long_running_operation(i)
+        await copilotkit_emit_state({"progress": i})
+    ```
+
+### Parameters
+
+<PropertyReference name="state" type="Any" required> 
+The state to emit (Must be JSON serializable).
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="Awaitable[bool]">
+Always return True.
+</PropertyReference>
+
+## copilotkit_predict_state
+
+Stream tool calls as state to CopilotKit.
+
+    To emit a tool call as streaming CrewAI state, pass the destination key in state,
+    the tool name and optionally the tool argument. (If you don't pass the argument name,
+    all arguments are emitted under the state key.)
+
+    ```python
+    from copilotkit.crewai import copilotkit_predict_state
+
+    await copilotkit_predict_state(
+        {
+            "steps": {
+                "tool_name": "SearchTool",
+                "tool_argument": "steps",
+            },
+        }
+    )
+    ```
+
+### Parameters
+
+<PropertyReference name="config" type="Dict[str, CopilotKitPredictStateConfig]" required> 
+The configuration to predict the state.
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="Awaitable[bool]">
+Always return True.
+</PropertyReference>
+
+## copilotkit_emit_message
+
+Manually emits a message to CopilotKit. Useful in longer running nodes to update the user.
+    Important: You still need to return the messages from the node.
+
+    ### Examples
+
+    ```python
+    from copilotkit.crewai import copilotkit_emit_message
+
+    message = "Step 1 of 10 complete"
+    await copilotkit_emit_message(message)
+
+    # Return the message from the node
+    return {
+        "messages": [AIMessage(content=message)]
+    }
+    ```
+
+### Parameters
+
+<PropertyReference name="message" type="str" required> 
+The message to emit.
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="Awaitable[bool]">
+Always return True.
+</PropertyReference>
+
+## copilotkit_emit_tool_call
+
+Manually emits a tool call to CopilotKit.
+
+    ```python
+    from copilotkit.crewai import copilotkit_emit_tool_call
+
+    await copilotkit_emit_tool_call(name="SearchTool", args={"steps": 10})
+    ```
+
+### Parameters
+
+<PropertyReference name="name" type="str" required> 
+The name of the tool to emit.
+</PropertyReference>
+
+<PropertyReference name="args" type="Dict[str, Any]" required> 
+The arguments to emit.
+</PropertyReference>
+
+### Returns
+
+<PropertyReference name="returns" type="Awaitable[bool]">
+Always return True.
+</PropertyReference>
+

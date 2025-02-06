@@ -2,9 +2,10 @@
 
 import json
 from typing import cast
-from research_canvas.state import AgentState
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import ToolMessage, AIMessage
+from research_canvas.langgraph.state import AgentState
+
 async def delete_node(state: AgentState, config: RunnableConfig): # pylint: disable=unused-argument
     """
     Delete Node

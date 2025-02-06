@@ -4,10 +4,8 @@ import {
   OpenAIAdapter,
   copilotRuntimeNextJSAppRouterEndpoint,
 } from "@copilotkit/runtime";
-import OpenAI from "openai";
 
-const openai = new OpenAI();
-const serviceAdapter = new OpenAIAdapter({ openai });
+const serviceAdapter = new OpenAIAdapter({});
 
 const runtime = new CopilotRuntime({
   remoteEndpoints: [

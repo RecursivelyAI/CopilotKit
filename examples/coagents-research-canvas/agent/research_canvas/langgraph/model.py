@@ -4,7 +4,7 @@ This module provides a function to get a model based on the configuration.
 import os
 from typing import cast, Any
 from langchain_core.language_models.chat_models import BaseChatModel
-from research_canvas.state import AgentState
+from research_canvas.langgraph.state import AgentState
 
 def get_model(state: AgentState) -> BaseChatModel:
     """

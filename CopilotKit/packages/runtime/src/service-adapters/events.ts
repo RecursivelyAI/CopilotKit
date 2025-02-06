@@ -14,7 +14,7 @@ import {
 import { streamLangChainResponse } from "./langchain/utils";
 import { GuardrailsResult } from "../graphql/types/guardrails-result.type";
 import telemetry from "../lib/telemetry-client";
-import { isLangGraphAgentAction } from "../lib/runtime/remote-actions";
+import { isRemoteAgentAction } from "../lib/runtime/remote-actions";
 import { ActionInput } from "../graphql/inputs/action.input";
 import { ActionExecutionMessage, ResultMessage } from "../graphql/types/converted";
 import { plainToInstance } from "class-transformer";
@@ -366,7 +366,7 @@ async function executeAction(
   }
 
   // handle LangGraph agents
-  if (isLangGraphAgentAction(action)) {
+  if (isRemoteAgentAction(action)) {
     const result = `${action.name} agent started`;
 
     const agentExecution = plainToInstance(ActionExecutionMessage, {
@@ -391,7 +391,7 @@ async function executeAction(
       result,
     });
 
-    const stream = await action.langGraphAgentHandler({
+    const stream = await action.remoteAgentHandler({
       name: action.name,
       threadId,
       actionInputsWithoutAgents,

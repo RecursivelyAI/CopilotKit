@@ -54,7 +54,7 @@ export type RemoteActionInfoResponse = {
   agents: any[];
 };
 
-export type LangGraphAgentHandlerParams = {
+export type RemoteAgentHandlerParams = {
   name: string;
   actionInputsWithoutAgents: ActionInput[];
   threadId?: string;
@@ -63,15 +63,15 @@ export type LangGraphAgentHandlerParams = {
   metaEvents?: MetaEventInput[];
 };
 
-export type LangGraphAgentAction = Action<any> & {
-  langGraphAgentHandler: (params: LangGraphAgentHandlerParams) => Promise<Observable<RuntimeEvent>>;
+export type RemoteAgentAction = Action<any> & {
+  remoteAgentHandler: (params: RemoteAgentHandlerParams) => Promise<Observable<RuntimeEvent>>;
 };
 
-export function isLangGraphAgentAction(action: Action<any>): action is LangGraphAgentAction {
+export function isRemoteAgentAction(action: Action<any>): action is RemoteAgentAction {
   if (!action) {
     return false;
   }
-  return typeof (action as LangGraphAgentAction).langGraphAgentHandler === "function";
+  return typeof (action as RemoteAgentAction).remoteAgentHandler === "function";
 }
 
 async function fetchRemoteInfo({

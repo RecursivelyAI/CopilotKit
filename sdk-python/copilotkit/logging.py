@@ -20,6 +20,6 @@ def bold(text: str) -> str:
     """
     Bold the given text.
     """
-    if sys.stdout.isatty():
+    if hasattr(sys.stdout, 'isatty') and sys.stdout.isatty():
         return f"\033[1m{text}\033[0m"
     return text

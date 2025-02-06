@@ -9,11 +9,11 @@ from typing import cast
 from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
-from research_canvas.state import AgentState
-from research_canvas.download import download_node
-from research_canvas.chat import chat_node
-from research_canvas.search import search_node
-from research_canvas.delete import delete_node, perform_delete_node
+from research_canvas.langgraph.state import AgentState
+from research_canvas.langgraph.download import download_node
+from research_canvas.langgraph.chat import chat_node
+from research_canvas.langgraph.search import search_node
+from research_canvas.langgraph.delete import delete_node, perform_delete_node
 
 # Define a new graph
 workflow = StateGraph(AgentState)

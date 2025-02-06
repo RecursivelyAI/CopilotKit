@@ -122,6 +122,7 @@ export const REFERENCE_DOCS: ReferenceDocConfiguration[] = [
       "The useCoAgent hook allows you to share state bidirectionally between your application and the agent.",
   },
   /* SDKs */
+
   {
     sourcePath: "../sdk-python/copilotkit/langgraph.py",
     destinationPath: "docs/content/docs/reference/sdk/python/LangGraph.mdx",
@@ -137,11 +138,34 @@ export const REFERENCE_DOCS: ReferenceDocConfiguration[] = [
     ],
   },
   {
+    sourcePath: "../sdk-python/copilotkit/crewai.py",
+    destinationPath: "docs/content/docs/reference/sdk/python/CrewAI.mdx",
+    title: "CrewAI SDK",
+    description:
+      "The CopilotKit CrewAI SDK for Python allows you to build and run CrewAI agents with CopilotKit.",
+    pythonSymbols: [
+      "copilotkit_emit_state",
+      "copilotkit_predict_state",
+      "copilotkit_exit",
+      "copilotkit_emit_message",
+      "copilotkit_emit_tool_call",
+    ],
+  },
+
+  /* Agents */
+  {
     sourcePath: "../sdk-python/copilotkit/langgraph_agent.py",
     destinationPath: "docs/content/docs/reference/sdk/python/LangGraphAgent.mdx",
     title: "LangGraphAgent",
     description: "LangGraphAgent lets you define your agent for use with CopilotKit.",
     pythonSymbols: ["LangGraphAgent", "CopilotKitConfig"],
+  },
+  {
+    sourcePath: "../sdk-python/copilotkit/crewai_agent.py",
+    destinationPath: "docs/content/docs/reference/sdk/python/CrewAIAgent.mdx",
+    title: "CrewAIAgent",
+    description: "CrewAIAgent lets you define your agent for use with CopilotKit.",
+    pythonSymbols: ["CrewAIAgent", "CopilotKitConfig"],
   },
   {
     sourcePath: "../sdk-python/copilotkit/sdk.py",

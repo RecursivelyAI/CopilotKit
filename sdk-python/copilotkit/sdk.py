@@ -5,7 +5,7 @@ from importlib import metadata
 
 from pprint import pformat
 from typing import List, Callable, Union, Optional, Any, Coroutine
-from typing_extensions import TypedDict, Tuple
+from typing_extensions import TypedDict, Tuple, cast
 from .agent import Agent, AgentDict
 from .action import Action, ActionDict, ActionResultDict
 from .types import Message, MetaEvent
@@ -19,7 +19,7 @@ from .logging import get_logger, bold
 
 
 try:
-    __version__ = metadata.version(__package__)
+    __version__ = metadata.version(cast(str, __package__))
 except metadata.PackageNotFoundError:
     # Case where package metadata is not available.
     __version__ = ""
@@ -66,9 +66,10 @@ class CopilotKitRemoteEndpoint:
     pip install copilotkit
     ```
 
-    ### Examples
+    ## Adding actions
 
-    For example, to provide a simple action to the Copilot:
+    In this example, we provide a simple action to the Copilot:
+
     ```python
     from copilotkit import CopilotKitRemoteEndpoint, Action
 
@@ -91,7 +92,7 @@ class CopilotKitRemoteEndpoint:
     ```
 
     You can also dynamically build actions by providing a callable that returns a list of actions.
-    In this example, we use `"name"` from the `properties` object to parameterize the action handler.
+    In this example, we use "name" from the `properties` object to parameterize the action handler.
 
     ```python
     from copilotkit import CopilotKitRemoteEndpoint, Action
@@ -119,7 +120,9 @@ class CopilotKitRemoteEndpoint:
     )
     ```
 
-    Similarly, you can give a list of static or dynamic agents to the Copilot:
+    ## Adding agents
+
+    Serving agents works in a similar way to serving actions:
 
     ```python
     from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
@@ -127,7 +130,7 @@ class CopilotKitRemoteEndpoint:
 
     sdk = CopilotKitRemoteEndpoint(
         agents=[
-        LangGraphAgent(
+            LangGraphAgent(
                 name="email_agent",
                 description="This agent sends emails",
                 graph=graph,
@@ -135,6 +138,41 @@ class CopilotKitRemoteEndpoint:
         ]
     )
     ```
+
+    To dynamically build agents, provide a callable that returns a list of agents:
+
+    ```python
+    from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
+    from my_agent.agent import graph
+
+    sdk = CopilotKitRemoteEndpoint(
+        agents=lambda context: [
+            LangGraphAgent(
+                name="email_agent",
+                description="This agent sends emails",
+                graph=graph,
+                langgraph_config={
+                    "token": context["properties"]["token"]
+                }
+            )
+        ]
+    )
+    ```
+
+    To restrict the agents available to the Copilot, simply return a different list of agents based on the `context`:
+
+    ```python
+    from copilotkit import CopilotKitRemoteEndpoint
+    from my_agents import agent_a, agent_b, is_admin
+
+    sdk = CopilotKitRemoteEndpoint(
+        agents=lambda context: (
+            [agent_a, agent_b] if is_admin(context["properties"]["token"]) else [agent_a]
+        )
+    )
+    ```
+
+    ## Serving the CopilotKit SDK
 
     To serve the CopilotKit SDK, you can use the `add_fastapi_endpoint` function from the `copilotkit.integrations.fastapi` module:
 
@@ -262,10 +300,10 @@ class CopilotKitRemoteEndpoint:
         context: CopilotKitContext,
         name: str,
         thread_id: str,
-        node_name: str,
         state: dict,
         messages: List[Message],
         actions: List[ActionDict],
+        node_name: str,
         meta_events: Optional[List[MetaEvent]] = None,
     ) -> Any:
         """

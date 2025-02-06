@@ -17,6 +17,7 @@
     "pino",
     "langsmith",
     "readables",
-    "uuidv4"
+    "uuidv4",
+    "crewai"
   ]
 }

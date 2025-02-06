@@ -39,8 +39,8 @@ import { Message } from "../../graphql/types/converted";
 import { ForwardedParametersInput } from "../../graphql/inputs/forwarded-parameters.input";
 
 import {
-  isLangGraphAgentAction,
-  LangGraphAgentAction,
+  isRemoteAgentAction,
+  RemoteAgentAction,
   EndpointType,
   setupRemoteActions,
   EndpointDefinition,
@@ -299,7 +299,7 @@ please use an LLM adapter instead.`,
           (action) =>
             // TODO-AGENTS: do not exclude ALL server side actions
             !serverSideActions.find((serverSideAction) => serverSideAction.name == action.name),
-          // !isLangGraphAgentAction(
+          // !isRemoteAgentAction(
           //   serverSideActions.find((serverSideAction) => serverSideAction.name == action.name),
           // ),
         ),
@@ -479,15 +479,15 @@ please use an LLM adapter instead.`,
     const messages = convertGqlInputToMessages(rawMessages);
 
     const agent = serverSideActions.find(
-      (action) => action.name === agentName && isLangGraphAgentAction(action),
-    ) as LangGraphAgentAction;
+      (action) => action.name === agentName && isRemoteAgentAction(action),
+    ) as RemoteAgentAction;
 
     if (!agent) {
       throw new CopilotKitAgentDiscoveryError({ agentName });
     }
 
     const serverSideActionsInput: ActionInput[] = serverSideActions
-      .filter((action) => !isLangGraphAgentAction(action))
+      .filter((action) => !isRemoteAgentAction(action))
       .map((action) => ({
         name: action.name,
         description: action.description,
@@ -507,7 +507,7 @@ please use an LLM adapter instead.`,
     });
     try {
       const eventSource = new RuntimeEventSource();
-      const stream = await agent.langGraphAgentHandler({
+      const stream = await agent.remoteAgentHandler({
         name: agentName,
         threadId,
         nodeName,

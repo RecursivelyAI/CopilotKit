@@ -1,5 +1,6 @@
 """Agents"""
 
+import re
 from typing import Optional, List, TypedDict
 from abc import ABC, abstractmethod
 from .types import Message
@@ -22,6 +23,12 @@ class Agent(ABC):
         self.name = name
         self.description = description
 
+        if not re.match(r"^[a-zA-Z0-9_-]+$", name):
+            raise ValueError(
+                f"Invalid agent name '{name}': " +
+                "must consist of alphanumeric characters, underscores, and hyphens only"
+            )
+
     @abstractmethod
     def execute( # pylint: disable=too-many-arguments
         self,
@@ -29,20 +36,24 @@ class Agent(ABC):
         state: dict,
         messages: List[Message],
         thread_id: Optional[str] = None,
-        node_name: Optional[str] = None,
         actions: Optional[List[ActionDict]] = None,
         meta_events: Optional[List[MetaEvent]] = None,
+        **kwargs,
     ):
         """Execute the agent"""
 
-    @abstractmethod
     def get_state(
         self,
         *,
         thread_id: str,
     ):
-        """Get agent state"""
-
+        """Default get_state implementation"""
+        return {
+            "threadId": thread_id,
+            "threadExists": False,
+            "state": {},
+            "messages": []
+        }
 
     def dict_repr(self) -> AgentDict:
         """Dict representation of the action"""

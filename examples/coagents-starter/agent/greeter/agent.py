@@ -36,7 +36,6 @@ async def react_node(state: AgentState, config: RunnableConfig) \
     -> Command[Literal["frontend_tool_node", "tool_node", "__end__"]]:
     """CopilotKit ReAct Agent"""
 
-
     model = ChatOpenAI(model="gpt-4o").bind_tools(
         [*state["copilotkit"]["actions"], greet_user]
     )

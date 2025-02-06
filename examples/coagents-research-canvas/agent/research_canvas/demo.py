@@ -1,25 +1,31 @@
 """Demo"""
 
 import os
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 load_dotenv()
 
 # pylint: disable=wrong-import-position
 from fastapi import FastAPI
 import uvicorn
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
-from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
-from research_canvas.agent import graph
+from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent, CrewAIAgent
+from research_canvas.crewai.agent import ResearchCanvasFlow
+from research_canvas.langgraph.agent import graph
 
 app = FastAPI()
 sdk = CopilotKitRemoteEndpoint(
     agents=[
+        CrewAIAgent(
+            name="research_agent_crewai",
+            description="Research agent.",
+            flow=ResearchCanvasFlow(),
+        ),
         LangGraphAgent(
             name="research_agent",
             description="Research agent.",
             graph=graph,
         ),
-        LangGraphAgent(
+         LangGraphAgent(
             name="research_agent_google_genai",
             description="Research agent.",
             graph=graph
@@ -34,6 +40,7 @@ add_fastapi_endpoint(app, sdk, "/copilotkit")
 def health():
     """Health check."""
     return {"status": "ok"}
+
 
 def main():
     """Run the uvicorn server."""
