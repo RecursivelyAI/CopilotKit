@@ -123,3 +123,37 @@
     @apply lg:mt-10;
   }
 } 
+
+@media (min-width: 1024px) {
+  .lg\:block {
+    @apply block;
+  }
+  .lg\:hidden {
+    @apply hidden;
+  }
+  .max-md\:hidden {
+    @apply !hidden;
+  }
+  .max-lg\:hidden {
+    @apply !hidden;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:block {
+    @apply block;
+  }
+  .max-md\:hidden {
+    @apply !hidden;
+  }
+}
+
+@media not all and (min-width: 1024px) {
+  .max-md\:hidden {
+    @apply !hidden;
+  }
+
+  .max-lg\:hidden {
+    @apply !hidden;
+  }
+}
