@@ -34,19 +34,19 @@
   "devDependencies": {
     "@types/jest": "^29.5.4",
     "@types/uuid": "^10.0.0",
-    "eslint": "^8.56.0",
+    "eslint": "^9.0.0",
     "eslint-config-custom": "workspace:*",
     "jest": "^29.6.4",
     "ts-jest": "^29.1.1",
     "tsconfig": "workspace:*",
-    "tsup": "^6.7.0",
+    "tsup": "^8.0.0",
     "typescript": "^5.2.3"
   },
   "dependencies": {
     "@segment/analytics-node": "^2.1.2",
-    "chalk": "4.1.2",
+    "chalk": "5.4.1",
     "graphql": "^16.8.1",
-    "uuid": "^10.0.0",
+    "uuid": "^11.0.0",
     "zod": "^3.23.3",
     "zod-to-json-schema": "^3.23.5"
   },
